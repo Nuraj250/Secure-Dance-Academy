@@ -26,4 +26,16 @@ describe("CSRF protection", () => {
       ),
     ).toThrow(CsrfError);
   });
+
+  it("rejects malformed or missing origins", () => {
+    expect(() =>
+      assertSameOriginRequest(
+        createRequest("not-a-url"),
+        "http://localhost:3000",
+      ),
+    ).toThrow(CsrfError);
+    expect(() =>
+      assertSameOriginRequest(createRequest(null), "http://localhost:3000"),
+    ).toThrow(CsrfError);
+  });
 });

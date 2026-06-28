@@ -1,4 +1,12 @@
-import { env } from "@/lib/env";
+import { env } from "../lib/env";
+
+const supabaseConnectSrc = env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(env.NEXT_PUBLIC_SUPABASE_URL).origin
+  : null;
+
+const connectSrc = ["'self'", supabaseConnectSrc, "https://*.supabase.co"]
+  .filter((value): value is string => Boolean(value))
+  .join(" ");
 
 export const publicRoutePrefixes = [
   "/",
@@ -40,7 +48,7 @@ const scriptSrc =
 
 export const responseSecurityHeaders = {
   "Content-Security-Policy":
-    `default-src 'self'; ${scriptSrc} style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self';`,
+    `default-src 'self'; ${scriptSrc} style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src ${connectSrc}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';`,
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
@@ -48,4 +56,9 @@ export const responseSecurityHeaders = {
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
   "X-DNS-Prefetch-Control": "off",
+  ...(env.NODE_ENV === "production"
+    ? {
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      }
+    : {}),
 };

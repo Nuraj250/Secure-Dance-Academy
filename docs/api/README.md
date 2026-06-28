@@ -8,6 +8,7 @@ Management System.
 - Every response uses the standard `{ status, message, data }` envelope.
 - Errors use `{ status: "error", errorCode, message, validationDetails? }`.
 - Mutating routes require same-origin requests and server-side validation.
+- Sensitive routes are rate limited and may return `429` with `Retry-After`.
 - Protected routes resolve the current Supabase-backed session before business
   logic runs.
 - Business logic stays in feature services, not route handlers.
@@ -35,6 +36,9 @@ Validation is centralized in Zod schemas under `features/*/schemas/` and parsed
 through `lib/validation/request.ts`. This keeps route handlers thin and keeps the
 validated shape aligned with the service contract.
 
+Route handlers also apply request-scoped rate limits where abuse is more likely,
+especially around session checks, user listings, and authentication flows.
+
 ## Error Model
 
 The backend emits explicit application errors for:
@@ -47,3 +51,6 @@ The backend emits explicit application errors for:
 - Rate limiting.
 - CSRF failures.
 - Service availability issues.
+
+Rate-limited responses include a `Retry-After` header when the reset window can
+be calculated.

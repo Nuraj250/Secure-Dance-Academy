@@ -52,4 +52,30 @@ describe("route handler wrapper", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({ status: "ok" });
   });
+
+  it("adds retry-after headers to rate limited responses", async () => {
+    const key = `route-limit:${Date.now()}`;
+    const handler = withApiRoute(
+      async () => NextResponse.json({ status: "ok" }, { status: 200 }),
+      {
+        rateLimit: {
+          key,
+          limit: 1,
+          windowMs: 60_000,
+          message: "Slow down.",
+        },
+      },
+    );
+
+    const firstResponse = await handler(createRequest(), {
+      params: Promise.resolve({}),
+    });
+    const secondResponse = await handler(createRequest(), {
+      params: Promise.resolve({}),
+    });
+
+    expect(firstResponse.status).toBe(200);
+    expect(secondResponse.status).toBe(429);
+    expect(secondResponse.headers.get("Retry-After")).toBeTruthy();
+  });
 });

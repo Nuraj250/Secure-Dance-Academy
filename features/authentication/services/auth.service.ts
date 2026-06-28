@@ -2,6 +2,7 @@ import { withPrismaTransaction } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sanitizeEmail } from "@/lib/security/sanitize";
 import { createAuditEvent } from "@/lib/security/audit";
+import { createRateLimitKey, enforceRateLimit } from "@/lib/security/rate-limit";
 import {
   AccountPendingError,
   AuthenticationError,
@@ -33,6 +34,14 @@ export class AuthenticationService {
     requestContext: RequestContext,
   ) {
     const parsedInput = signInSchema.parse(input);
+    enforceRateLimit(
+      createRateLimitKey("auth", "login", parsedInput.email),
+      {
+        limit: 5,
+        windowMs: 15 * 60 * 1000,
+      },
+      "Too many sign-in attempts for this account. Please try again later.",
+    );
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.signInWithPassword({
       email: parsedInput.email,
@@ -195,8 +204,16 @@ export class AuthenticationService {
     requestContext: RequestContext,
   ) {
     const parsedInput = passwordRecoverySchema.parse(input);
-    const supabase = await createSupabaseServerClient();
     const email = sanitizeEmail(parsedInput.email);
+    enforceRateLimit(
+      createRateLimitKey("auth", "forgot-password", email),
+      {
+        limit: 3,
+        windowMs: 60 * 60 * 1000,
+      },
+      "Too many password reset requests for this account. Please try again later.",
+    );
+    const supabase = await createSupabaseServerClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${siteConfig.appUrl}/reset-password`,
@@ -247,6 +264,19 @@ export class AuthenticationService {
     const parsedInput = passwordResetSchema.parse(input);
     const supabase = await createSupabaseServerClient();
     const session = await this.sessionService.resolveSession(requestContext);
+
+    enforceRateLimit(
+      createRateLimitKey(
+        "auth",
+        "reset-password",
+        session.user?.supabaseUserId ?? requestContext.ipAddress ?? "unknown",
+      ),
+      {
+        limit: 10,
+        windowMs: 15 * 60 * 1000,
+      },
+      "Too many password reset attempts. Please try again later.",
+    );
 
     if (!session.user) {
       throw new AuthenticationError(

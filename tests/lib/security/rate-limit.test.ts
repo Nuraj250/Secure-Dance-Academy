@@ -1,4 +1,9 @@
-import { checkRateLimit, createRateLimitKey } from "@/lib/security/rate-limit";
+import {
+  checkRateLimit,
+  createRateLimitKey,
+  enforceRateLimit,
+} from "@/lib/security/rate-limit";
+import { RateLimitError } from "@/lib/http/errors";
 
 describe("rate limit helper", () => {
   it("builds stable keys", () => {
@@ -16,5 +21,16 @@ describe("rate limit helper", () => {
     expect(first.allowed).toBe(true);
     expect(second.allowed).toBe(true);
     expect(third.allowed).toBe(false);
+  });
+
+  it("throws a rate limit error when the limit is exceeded", () => {
+    const key = `enforce:${Date.now()}`;
+
+    expect(() =>
+      enforceRateLimit(key, { limit: 1, windowMs: 60_000 }),
+    ).not.toThrow();
+    expect(() =>
+      enforceRateLimit(key, { limit: 1, windowMs: 60_000 }),
+    ).toThrow(RateLimitError);
   });
 });

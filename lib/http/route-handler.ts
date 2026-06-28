@@ -1,17 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { siteConfig } from "@/config/site";
 import { errorResponse } from "@/lib/api/responses";
-import { isAppError, RateLimitError } from "@/lib/http/errors";
+import { isAppError } from "@/lib/http/errors";
 import {
   buildRequestContext,
   type RequestContext,
 } from "@/lib/http/request-context";
 import { assertSameOriginRequest } from "@/lib/security/csrf";
 import { logSecurityEvent } from "@/lib/security/logger";
-import {
-  checkRateLimit,
-  type RateLimitResult,
-} from "@/lib/security/rate-limit";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
 
 type ApiHandler<TRouteContext = { params: Promise<Record<string, never>> }> = (
   request: NextRequest,
@@ -33,21 +30,6 @@ function isMutationMethod(method: string) {
   return ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase());
 }
 
-function toRateLimitError(
-  result: RateLimitResult,
-  message?: string,
-): RateLimitError {
-  const retryAfterSeconds = Math.max(
-    1,
-    Math.ceil((result.resetAt - Date.now()) / 1000),
-  );
-
-  return new RateLimitError(message, {
-    retryAfterSeconds,
-    remaining: result.remaining,
-  });
-}
-
 export function withApiRoute<TRouteContext = { params: Promise<Record<string, never>> }>(
   handler: ApiHandler<TRouteContext>,
   options: RouteOptions = {},
@@ -65,14 +47,14 @@ export function withApiRoute<TRouteContext = { params: Promise<Record<string, ne
           typeof options.rateLimit.key === "function"
             ? options.rateLimit.key(request, context)
             : options.rateLimit.key;
-        const result = checkRateLimit(key, {
-          limit: options.rateLimit.limit,
-          windowMs: options.rateLimit.windowMs,
-        });
-
-        if (!result.allowed) {
-          throw toRateLimitError(result, options.rateLimit.message);
-        }
+        enforceRateLimit(
+          key,
+          {
+            limit: options.rateLimit.limit,
+            windowMs: options.rateLimit.windowMs,
+          },
+          options.rateLimit.message,
+        );
       }
 
       return await handler(request, context, routeContext);
@@ -92,12 +74,24 @@ export function withApiRoute<TRouteContext = { params: Promise<Record<string, ne
           },
         });
 
-        return errorResponse(
+        const response = errorResponse(
           error.errorCode,
           error.message,
           error.statusCode,
           error.details,
         );
+
+        if (
+          error.errorCode === "RATE_LIMITED" &&
+          typeof error.details?.retryAfterSeconds === "number"
+        ) {
+          response.headers.set(
+            "Retry-After",
+            String(error.details.retryAfterSeconds),
+          );
+        }
+
+        return response;
       }
 
       if (error instanceof Error) {

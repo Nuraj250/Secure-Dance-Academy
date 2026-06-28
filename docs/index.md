@@ -14,8 +14,8 @@ reference for requirements, design, implementation, testing, and deployment.
 | UI | UX blueprint, design system, screen inventory, and responsive behavior. | `docs/ui/README.md` |
 | API | Backend route contract, response envelopes, and request validation notes. | `docs/api/README.md` |
 | Backend | Backend foundation, feature modules, and implementation notes. | `docs/backend/README.md` |
-| Security | Security controls, trust boundaries, and server-side protection model. | `docs/security/README.md` |
-| Testing | Test strategy, validation expectations, and quality gates. | `docs/testing/README.md` |
+| Security | Security controls, trust boundaries, threat model, and residual risk tracking. | `docs/security/README.md`, `docs/security/SECURITY_REVIEW.md`, `docs/security/THREAT_MODEL.md`, `docs/security/RESIDUAL_RISK_REGISTER.md` |
+| Testing | Test strategy, validation expectations, quality gates, and QA evidence. | `docs/testing/README.md`, `docs/testing/MASTER_TEST_PLAN.md`, `docs/testing/INTEGRATION_TEST_PLAN.md`, `docs/testing/API_TEST_PLAN.md`, `docs/testing/PLAYWRIGHT_TEST_PLAN.md`, `docs/testing/SECURITY_TESTING_REPORT.md`, `docs/testing/OWASP_ZAP_PREPARATION.md`, `docs/testing/SONARQUBE_PREPARATION.md`, `docs/testing/ACCESSIBILITY_CHECKLIST.md`, `docs/testing/PERFORMANCE_CHECKLIST.md`, `docs/testing/REGRESSION_CHECKLIST.md`, `docs/testing/RISK_BASED_TEST_MATRIX.md`, `docs/testing/BUG_REGISTER.md`, `docs/testing/TEST_EVIDENCE.md`, `docs/testing/COVERAGE_SUMMARY.md`, `docs/testing/FINAL_QA_REPORT.md` |
 | Deployment | Runtime and deployment guidance for local and production environments. | `docs/deployment/README.md` |
 | Decisions | Architecture Decision Records captured during the approved design phases. | `docs/decisions/*.md` |
 

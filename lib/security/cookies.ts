@@ -19,11 +19,13 @@ export function hasSupabaseSessionCookie(
 export function normalizeSecureCookieOptions(
   options: SecureCookieOptions | undefined,
 ): SecureCookieOptions {
+  const { domain: _domain, ...rest } = options ?? {};
+
   return {
+    ...rest,
     httpOnly: true,
     sameSite: "lax",
     secure: env.NODE_ENV === "production",
     path: "/",
-    ...options,
   };
 }

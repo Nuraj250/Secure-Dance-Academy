@@ -1,10 +1,11 @@
 # Backend Foundation
 
-Status: Task 06 complete, awaiting approval
+Status: Task 08 complete
 
 This document describes the backend foundation implemented for the Secure Dance
 Academy Management System. It follows the approved architecture, the Prisma data
-layer decision, and the secure-cookie Supabase auth decision.
+layer decision, the secure-cookie Supabase auth decision, and the security
+hardening added in Task 08.
 
 ## Scope
 
@@ -13,9 +14,11 @@ The backend foundation provides:
 - Feature-based module boundaries.
 - Supabase server-client integration.
 - Session resolution and RBAC helpers.
-- Authorization helpers for role and ownership checks.
+- Authorization helpers for role, ownership, and account-state checks.
 - Standard API response envelopes.
 - Request parsing, validation, and CSRF checks for mutating routes.
+- Route and service level rate limiting for authentication and sensitive data flows.
+- Security headers and cookie normalization through shared config.
 - Audit logging and security logging.
 - Prisma-backed repositories and transactional updates.
 - Initial auth, profile, users, and audit route handlers.
@@ -115,21 +118,26 @@ and return a standardized response. Business logic stays in the service layer.
 ## Validation And Security Notes
 
 - All mutating routes use same-origin checks.
+- Sensitive flows are rate limited before the feature service runs.
 - All route handlers return standardized success and error envelopes.
 - Sensitive actions emit audit records with actor, request, entity, and outcome
   fields.
 - Logging redacts obvious secrets before payloads reach the console.
 - Supabase cookies are normalized to secure defaults when server code writes them.
+- Security headers are centralized so route files do not duplicate browser
+  hardening rules.
 
 ## Test Coverage
 
 Backend unit tests currently cover:
 
 - RBAC helpers.
-- CSRF origin checks.
+- Authorization helpers and account-state checks.
+- CSRF origin validation.
 - Rate limit helpers.
+- Secure cookie helpers.
+- Security header generation.
 - Sanitization helpers.
 - API response helpers.
 - Request validation helpers.
 - Route handler error mapping.
-

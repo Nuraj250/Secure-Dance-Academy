@@ -1,3 +1,5 @@
+import { RateLimitError } from "@/lib/http/errors";
+
 type RateLimitRecord = {
   count: number;
   resetAt: number;
@@ -43,6 +45,34 @@ export function checkRateLimit(
     remaining: options.limit - current.count,
     resetAt: current.resetAt,
   };
+}
+
+function toRetryAfterSeconds(result: RateLimitResult) {
+  return Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000));
+}
+
+export function createRateLimitError(
+  result: RateLimitResult,
+  message?: string,
+) {
+  return new RateLimitError(message, {
+    retryAfterSeconds: toRetryAfterSeconds(result),
+    remaining: result.remaining,
+  });
+}
+
+export function enforceRateLimit(
+  key: string,
+  options: { limit: number; windowMs: number },
+  message?: string,
+) {
+  const result = checkRateLimit(key, options);
+
+  if (!result.allowed) {
+    throw createRateLimitError(result, message);
+  }
+
+  return result;
 }
 
 export function createRateLimitKey(...segments: Array<string | number | null | undefined>) {
