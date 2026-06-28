@@ -19,7 +19,7 @@ completed task and kept as the single source of truth for project progress.
 - Authentication: Supabase Authentication
 - Deployment: Vercel, Docker, Docker Compose
 - Testing: Jest, Playwright, OWASP ZAP, SonarQube
-- Status: Planning Phase completed, Task 01 completed
+- Status: Planning Phase completed, Task 01 completed, Task 02 completed
 
 ## Project Goals
 
@@ -32,7 +32,7 @@ completed task and kept as the single source of truth for project progress.
 ## Current Progress
 
 - Project Planning: Completed
-- Requirements Engineering: Not Started
+- Requirements Engineering: Completed
 - Architecture Design: Not Started
 - Database Design: Not Started
 - UI Design: Not Started
@@ -63,6 +63,7 @@ completed task and kept as the single source of truth for project progress.
 - Engineering Rules
 - Project Memory
 - Project Initialization Task 01 completed
+- Requirements Engineering Task 02 completed
 
 ## Approved Technologies
 
@@ -145,6 +146,24 @@ completed task and kept as the single source of truth for project progress.
 - Backup automation: Pending
 - Analytics dashboard: Pending
 
+## Approved Requirements Baseline
+
+- Single-academy baseline with future expansion left open.
+- Administrator, coach, parent, and artist workflows are in scope.
+- Child artist profiles are treated as protected dependent profiles managed by
+  authorized adults.
+- Attendance, performance, injury, medical, activity, report, dashboard, settings,
+  audit, search, filtering, pagination, and export requirements are in scope.
+- Payments, mobile apps, multi-academy tenancy, AI assistance, and public marketing
+  pages remain out of scope for the requirements baseline.
+
+## Requirements Phase Risks
+
+- Child and medical data must remain tightly protected.
+- Scope creep must be controlled before architecture begins.
+- Future decisions for notifications, email delivery, and backup automation remain
+  open and should not leak into the current baseline.
+
 ## Known Constraints
 
 - Coursework deadline must be met.
@@ -176,7 +195,7 @@ completed task and kept as the single source of truth for project progress.
 
 ## Deliverable Progress
 
-- Requirements: Pending
+- Requirements: Completed
 - Architecture: Pending
 - Database: Pending
 - Frontend: Pending
@@ -207,16 +226,15 @@ completed task and kept as the single source of truth for project progress.
 
 ## Next Task
 
-- Current Phase: Project Planning Complete
-- Next Phase: Requirements Engineering
-- Primary Owner: Requirements Engineer
-- Expected Deliverables: Software Requirements Specification, Use Cases, User Stories,
-  Business Rules, Security Requirements, Risk Analysis, STRIDE Model, Acceptance
-  Criteria, Requirements Traceability Matrix
+- Current Phase: Requirements Engineering Complete
+- Next Phase: System Architecture
+- Primary Owner: Solution Architect
+- Expected Deliverables: Architecture vision, component boundaries, data flow,
+  deployment design, and architecture decision records
 
 ## Project State
 
-- Overall Status: Task 01 completed
+- Overall Status: Task 02 completed
 - Engineering Team: Ready
 - Architecture: Pending
 - Development: Not Started

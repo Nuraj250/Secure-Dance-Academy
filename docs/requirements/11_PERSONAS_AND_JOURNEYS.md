@@ -1,0 +1,102 @@
+# Personas and User Journeys
+
+## Personas
+
+| Persona | Goals | Frustrations | Technical Skills | Accessibility Needs |
+| --- | --- | --- | --- | --- |
+| Administrator | Control access, keep records accurate, and oversee operations. | Too many manual checks and unclear history. | Moderate to high. | Fast navigation, dense but clear layouts. |
+| Coach | Track attendance, progress, and safeguarding issues. | Repeating data entry and hunting for the right records. | Moderate. | Keyboard support, clear forms, fast search. |
+| Parent | Monitor child wellbeing and progress. | Not knowing where to find information quickly. | Low to moderate. | Simple navigation, readable text, mobile-friendly layouts. |
+| Adult Artist | Review own progress and update profile information. | Unclear status and too many irrelevant screens. | Moderate. | Clear status, responsive design, accessible focus states. |
+| Child Artist | Receive protected oversight through adults and staff. | Confusing or overly complex interfaces. | Low. | Very simple language and minimal cognitive load. |
+
+## User Journeys
+
+### Registration and Access Setup
+
+1. An administrator creates or approves an account.
+2. The user receives credentials or a recovery path.
+3. The user signs in and reaches the correct role area.
+4. The system confirms the session and available actions.
+
+Pain points:
+
+- Account setup errors
+- Missing role assignment
+- Poor recovery guidance
+
+Security risks:
+
+- Unauthorized account creation
+- Credential compromise
+
+Improvement opportunities:
+
+- Clear validation
+- Controlled recovery
+- Guided role setup
+
+### Attendance Recording
+
+1. A coach selects the session.
+2. The coach selects the artist.
+3. The coach records attendance and saves it.
+4. The system confirms the record and logs the event.
+
+Pain points:
+
+- Wrong session selection
+- Duplicate entry
+- Slow list navigation
+
+Security risks:
+
+- Unassigned access
+- Tampering with attendance history
+
+Improvement opportunities:
+
+- Search, filter, and duplicate prevention
+- Clear confirmation
+
+### Medical Update Review
+
+1. An authorized user opens a protected record.
+2. The user updates approved fields.
+3. The system validates and stores the change.
+4. The event is logged for accountability.
+
+Pain points:
+
+- Overly complex forms
+- Unclear authorization boundaries
+
+Security risks:
+
+- Unapproved data exposure
+- Incorrect edits
+
+Improvement opportunities:
+
+- Restricted visibility
+- Strong validation and auditability
+
+### Report Review and Export
+
+1. The user selects a report type and filter set.
+2. The system returns permitted results.
+3. The user reviews and exports the report if allowed.
+
+Pain points:
+
+- Slow filtering
+- Excessive data in results
+
+Security risks:
+
+- Data leakage through exports
+
+Improvement opportunities:
+
+- Clear filters
+- Authorization-aware export
