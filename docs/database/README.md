@@ -901,9 +901,9 @@ flowchart TB
 
 - Prisma schema validation passed after formatting and relation completion.
 - Prisma client generation succeeded from the validated schema.
-- A targeted search found no stub markers in the database deliverables themselves
-  (`docs/database/README.md`, `prisma/schema.prisma`, `prisma/seed.ts`,
-  `docs/index.md`).
+- A targeted search found no incomplete markers in the database deliverables
+  themselves (`docs/database/README.md`, `prisma/schema.prisma`,
+  `prisma/seed.ts`, `docs/index.md`).
 - The seed script is idempotent and limited to approved reference data only.
 
 ## Review Notes
