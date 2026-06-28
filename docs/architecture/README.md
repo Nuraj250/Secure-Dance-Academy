@@ -7,6 +7,9 @@ Management System. It follows the approved requirements baseline and does not ad
 new business scope. It is written to support Task 04 and later implementation work
 without forcing a redesign.
 
+Each major architectural concept below is paired with a Mermaid diagram so the
+design is visual as well as descriptive.
+
 ## Architecture Baseline
 
 - Single-academy system for the current release.
@@ -75,6 +78,55 @@ The current repository already matches the intended direction:
 | Audit Logs | Immutable accountability trail | Append-only by design. |
 | Settings | Preferences and administrative configuration | Configuration is server-validated. |
 
+### Module Boundary Diagram
+
+```mermaid
+flowchart TB
+  subgraph Identity["Identity and Access"]
+    Authentication["Authentication"]
+    Users["Users"]
+    Roles["Roles"]
+  end
+
+  subgraph People["People and Ownership"]
+    Artists["Artists"]
+    Parents["Parents"]
+    Coaches["Coaches"]
+  end
+
+  subgraph Operations["Operational Records"]
+    Attendance["Attendance"]
+    Performance["Performance"]
+    Injuries["Injuries"]
+    Medical["Medical Records"]
+    Activities["Activities"]
+  end
+
+  subgraph Insight["Insight and Control"]
+    Dashboard["Dashboard"]
+    Reports["Reports"]
+    Notifications["Notifications"]
+    Audit["Audit Logs"]
+    Settings["Settings"]
+  end
+
+  Parents -.-> Artists
+  Coaches -.-> Artists
+  Artists -.-> Attendance
+  Artists -.-> Performance
+  Artists -.-> Injuries
+  Artists -.-> Medical
+  Attendance -.-> Reports
+  Performance -.-> Reports
+  Injuries -.-> Reports
+  Medical -.-> Reports
+  Activities -.-> Dashboard
+  Audit -.-> Dashboard
+```
+
+The arrows show permitted data flow between feature groups. They do not imply
+shared business logic.
+
 ## Layer Responsibilities
 
 | Layer | Responsibilities | Must Not Do |
@@ -85,6 +137,31 @@ The current repository already matches the intended direction:
 | Data Access | Repository methods and persistence mapping | Decide business policy. |
 | Infrastructure | Supabase, Prisma, logging, rate limiting, headers, env, external services | Leak implementation details into UI. |
 | Utilities | Pure helpers, formatting, small reusable functions | Grow into hidden business logic. |
+
+### Layer Dependency Diagram
+
+```mermaid
+classDiagram
+  class PresentationLayer
+  class ApplicationLayer
+  class BusinessLogicLayer
+  class DataAccessLayer
+  class InfrastructureLayer
+  class UtilityLayer
+
+  PresentationLayer --> ApplicationLayer : calls
+  ApplicationLayer --> BusinessLogicLayer : applies rules
+  DataAccessLayer ..> BusinessLogicLayer : implements gateways
+  InfrastructureLayer ..> DataAccessLayer : provides adapters
+  InfrastructureLayer ..> ApplicationLayer : runtime services
+  UtilityLayer <.. PresentationLayer : pure helpers
+  UtilityLayer <.. ApplicationLayer : pure helpers
+  UtilityLayer <.. BusinessLogicLayer : pure helpers
+  UtilityLayer <.. DataAccessLayer : pure helpers
+```
+
+This diagram shows the inward dependency rule and keeps presentation, business
+logic, data access, and infrastructure responsibilities distinct.
 
 ## Folder Structure
 
@@ -105,6 +182,30 @@ The current repository already matches the intended direction:
 | `tests/` | Test setup, helpers, and cross-feature test assets. |
 | `docs/` | Requirements, architecture, decisions, security, testing, and deployment documentation. |
 | `public/` | Static assets that do not require server processing. |
+
+### Folder Structure Diagram
+
+```mermaid
+flowchart TB
+  Root["Secure Dance Academy"]
+  Root --> App["app/"]
+  Root --> Features["features/"]
+  Root --> Components["components/"]
+  Root --> Services["services/"]
+  Root --> Repositories["repositories/"]
+  Root --> Lib["lib/"]
+  Root --> Hooks["hooks/"]
+  Root --> Types["types/"]
+  Root --> Utils["utils/"]
+  Root --> Config["config/"]
+  Root --> Prisma["prisma/"]
+  Root --> Tests["tests/"]
+  Root --> Docs["docs/"]
+  Root --> Public["public/"]
+```
+
+The top-level tree keeps ownership obvious and avoids dumping unrelated code into
+shared folders.
 
 ## Request Lifecycle
 
@@ -149,6 +250,95 @@ The current repository already matches the intended direction:
 | Audit Event | Immutable record of sensitive actions. |
 | Setting | User or system configuration item. |
 
+### Entity Relationship Diagram
+
+```mermaid
+erDiagram
+  USERS ||--o{ USER_ROLES : assigned
+  ROLES ||--o{ USER_ROLES : grants
+  USERS ||--o| ARTIST_PROFILES : owns
+  USERS ||--o| PARENT_PROFILES : owns
+  USERS ||--o| COACH_PROFILES : owns
+  PARENTS ||--o{ PARENT_ARTIST_LINKS : manages
+  ARTISTS ||--o{ PARENT_ARTIST_LINKS : dependent
+  COACHES ||--o{ COACH_ARTIST_ASSIGNMENTS : assigned
+  ARTISTS ||--o{ COACH_ARTIST_ASSIGNMENTS : tracked
+  ACTIVITIES ||--o{ ATTENDANCE_RECORDS : includes
+  ARTISTS ||--o{ ATTENDANCE_RECORDS : attends
+  ARTISTS ||--o{ PERFORMANCE_RECORDS : performs
+  ARTISTS ||--o{ INJURY_RECORDS : injury
+  ARTISTS ||--o{ MEDICAL_RECORDS : medical
+  USERS ||--o{ NOTIFICATIONS : receives
+  USERS ||--o{ AUDIT_EVENTS : performs
+
+  USERS {
+    uuid id PK
+    string email
+    string status
+  }
+  ROLES {
+    uuid id PK
+    string name
+  }
+  USER_ROLES {
+    uuid user_id FK
+    uuid role_id FK
+  }
+  ARTIST_PROFILES {
+    uuid id PK
+    uuid user_id FK
+    string performer_type
+  }
+  PARENT_PROFILES {
+    uuid id PK
+    uuid user_id FK
+  }
+  COACH_PROFILES {
+    uuid id PK
+    uuid user_id FK
+  }
+  PARENT_ARTIST_LINKS {
+    uuid parent_id FK
+    uuid artist_id FK
+  }
+  COACH_ARTIST_ASSIGNMENTS {
+    uuid coach_id FK
+    uuid artist_id FK
+  }
+  ACTIVITIES {
+    uuid id PK
+    string title
+  }
+  ATTENDANCE_RECORDS {
+    uuid id PK
+    uuid artist_id FK
+    uuid activity_id FK
+  }
+  PERFORMANCE_RECORDS {
+    uuid id PK
+    uuid artist_id FK
+  }
+  INJURY_RECORDS {
+    uuid id PK
+    uuid artist_id FK
+  }
+  MEDICAL_RECORDS {
+    uuid id PK
+    uuid artist_id FK
+  }
+  NOTIFICATIONS {
+    uuid id PK
+    uuid user_id FK
+  }
+  AUDIT_EVENTS {
+    uuid id PK
+    uuid actor_user_id FK
+  }
+```
+
+This model keeps identity, ownership, operational records, and auditability
+separate while preserving clear relationships for reporting and access control.
+
 ## Authentication Architecture
 
 - Supabase Authentication handles credentials, password reset, email verification,
@@ -159,6 +349,27 @@ The current repository already matches the intended direction:
   security requirements.
 - Logout invalidates the session server-side and removes the secure cookie.
 
+### Authentication Session State Diagram
+
+```mermaid
+stateDiagram-v2
+  [*] --> LoggedOut
+  LoggedOut --> Authenticating: submit credentials
+  Authenticating --> Authenticated: session issued
+  Authenticating --> LoggedOut: invalid credentials
+  Authenticated --> SessionRefreshing: access token nearing expiry
+  SessionRefreshing --> Authenticated: refresh succeeds
+  SessionRefreshing --> LoggedOut: refresh fails
+  Authenticated --> PasswordResetPending: request reset
+  PasswordResetPending --> LoggedOut: reset email sent
+  Authenticated --> SessionExpired: expiry
+  SessionExpired --> LoggedOut
+  Authenticated --> LoggedOut: logout
+```
+
+The authentication model has a small number of stable states so session handling
+remains predictable and secure.
+
 ## Authorization Architecture
 
 - Authorization is RBAC plus ownership plus context.
@@ -168,6 +379,24 @@ The current repository already matches the intended direction:
 - Parents can only access their own dependent artist profiles.
 - Artists can only access their own records.
 - Every protected endpoint checks identity, role, permission, and ownership.
+
+### Authorization Decision Flow
+
+```mermaid
+flowchart TD
+  Request["Protected request"] --> Session{Session valid?}
+  Session -- No --> Deny401["401 Unauthorized"]
+  Session -- Yes --> Role{Role allowed?}
+  Role -- No --> Deny403["403 Forbidden"]
+  Role -- Yes --> Ownership{Owns resource or is assigned?}
+  Ownership -- No --> Deny403
+  Ownership -- Yes --> Context{Business context allowed?}
+  Context -- No --> Deny403
+  Context -- Yes --> Permit["Execute use case"]
+```
+
+This keeps authorization server-side and makes the rejection path explicit before
+any business logic runs.
 
 ## State Management And Component Design
 
@@ -180,6 +409,29 @@ The current repository already matches the intended direction:
 - Forms, tables, charts, dialogs, badges, search, filters, and pagination controls
   are built as reusable primitives.
 
+### Component Ownership Diagram
+
+```mermaid
+classDiagram
+  class ServerComponent
+  class ClientComponent
+  class ServerAction
+  class FeatureModule
+  class SharedUI
+  class FormState
+  class QueryState
+
+  ServerComponent --> FeatureModule : renders
+  ClientComponent --> SharedUI : composes
+  ClientComponent --> ServerAction : submits mutations
+  ServerAction --> FeatureModule : executes use case
+  ClientComponent --> FormState : owns
+  ClientComponent --> QueryState : owns
+```
+
+This keeps state local where possible and keeps server actions as the mutation
+boundary instead of a global client store.
+
 ## Performance Strategy
 
 - Prefer server-side rendering and data fetching.
@@ -190,6 +442,22 @@ The current repository already matches the intended direction:
 - Lazy load heavy charts and infrequently used screens.
 - Avoid repeated queries and N+1 access patterns.
 
+### Performance Flow
+
+```mermaid
+flowchart LR
+  Request["User request"] --> Render["Server render"]
+  Render --> Select["Select only needed fields"]
+  Select --> Query["Indexed database query"]
+  Query --> Page["Paginate and filter"]
+  Page --> Cache["Cache and revalidate"]
+  Cache --> Lazy["Lazy load heavy UI"]
+  Lazy --> Response["Fast response"]
+```
+
+The strategy reduces round-trips, avoids over-fetching, and keeps the visible
+surface responsive.
+
 ## Scalability Strategy
 
 - Keep feature boundaries independent.
@@ -198,6 +466,19 @@ The current repository already matches the intended direction:
 - Keep reporting read-only so it can scale without duplicating business rules.
 - Keep the architecture compatible with future multi-academy expansion without
   forcing it into the current single-academy baseline.
+
+### Scalability Flow
+
+```mermaid
+flowchart LR
+  Baseline["Single-academy baseline"] --> Roles["Extensible RBAC"]
+  Roles --> Modules["Independent feature modules"]
+  Modules --> Services["Pluggable notification and reporting services"]
+  Services --> Growth["Future multi-academy and mobile clients"]
+```
+
+The architecture scales by adding isolated modules and service adapters instead of
+reshaping the whole system.
 
 ## Deployment Strategy
 

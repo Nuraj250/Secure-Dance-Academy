@@ -7,6 +7,8 @@ approved.
 ## Sections
 
 - `architecture/`
+- `database/`
+- `ui/`
 - `api/`
 - `security/`
 - `testing/`

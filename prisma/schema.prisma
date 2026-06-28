@@ -7,4 +7,694 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Business models will be added after requirements and database design approval.
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DISABLED
+  ARCHIVED
+}
+
+enum LinkStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+  INACTIVE
+}
+
+enum RecordStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ActivityKind {
+  CLASS
+  REHEARSAL
+  PERFORMANCE
+  EVENT
+  MEETING
+}
+
+enum ActivityStatus {
+  DRAFT
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+  ARCHIVED
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  WAITLISTED
+  WITHDRAWN
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PENDING
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+  VOIDED
+}
+
+enum PerformanceKind {
+  REHEARSAL
+  PERFORMANCE
+  ASSESSMENT
+  COMPETITION
+  SHOWCASE
+  OTHER
+}
+
+enum SeverityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum InjuryStatus {
+  OPEN
+  MONITORING
+  RECOVERED
+  CLOSED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  ARCHIVED
+}
+
+enum ExportFormat {
+  CSV
+  PDF
+  XLSX
+  JSON
+}
+
+enum ExportStatus {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+  EXPIRED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+enum ConsentScope {
+  DATA_PROCESSING
+  MEDICAL
+  MEDIA_RELEASE
+  EMERGENCY_CARE
+  TRAVEL
+}
+
+enum ConsentStatus {
+  PENDING
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum SettingScope {
+  SYSTEM
+  ACADEMY
+}
+
+enum RelationshipType {
+  PARENT
+  GUARDIAN
+  CAREGIVER
+  EMERGENCY_CONTACT
+  OTHER
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  DENIED
+}
+
+model User {
+  id                                        String                  @id @default(uuid()) @db.Uuid
+  supabase_user_id                          String                  @unique @db.Uuid
+  email                                     String                  @unique @db.VarChar(320)
+  first_name                                String                  @db.VarChar(100)
+  last_name                                 String                  @db.VarChar(100)
+  display_name                              String                  @db.VarChar(160)
+  phone                                     String?                 @db.VarChar(32)
+  status                                    UserStatus              @default(PENDING)
+  locale                                    String?                 @db.VarChar(32)
+  timezone                                  String?                 @db.VarChar(64)
+  last_login_at                             DateTime?               @db.Timestamptz(6)
+  disabled_at                               DateTime?               @db.Timestamptz(6)
+  archived_at                               DateTime?               @db.Timestamptz(6)
+  anonymized_at                             DateTime?               @db.Timestamptz(6)
+  version                                   Int                     @default(1)
+  created_at                                DateTime                @default(now()) @db.Timestamptz(6)
+  updated_at                                DateTime                @updatedAt @db.Timestamptz(6)
+  user_roles                                UserRole[]              @relation("user_role_user")
+  user_roles_granted_by                     UserRole[]              @relation("user_role_granted_by")
+  artist                                    Artist?                 @relation("artist_user")
+  artist_guardians_guardian_user            ArtistGuardian[]        @relation("artist_guardian_guardian_user")
+  artist_guardians_granted_by_user          ArtistGuardian[]        @relation("artist_guardian_granted_by_user")
+  coach_artist_assignments_coach_user       CoachArtistAssignment[] @relation("coach_assignment_coach_user")
+  coach_artist_assignments_assigned_by_user CoachArtistAssignment[] @relation("coach_assignment_assigned_by_user")
+  activity_enrollments_assigned_by_user     ActivityEnrollment[]    @relation("activity_enrollment_assigned_by_user")
+  attendance_records_recorded_by_user       AttendanceRecord[]      @relation("attendance_record_recorded_by_user")
+  performance_records_recorded_by_user      PerformanceRecord[]     @relation("performance_record_recorded_by_user")
+  injury_records_reported_by_user           InjuryRecord[]          @relation("injury_record_reported_by_user")
+  injury_records_reviewed_by_user           InjuryRecord[]          @relation("injury_record_reviewed_by_user")
+  consent_records_granted_by_user           ConsentRecord[]         @relation("consent_record_granted_by_user")
+  consent_records_recorded_by_user          ConsentRecord[]         @relation("consent_record_recorded_by_user")
+  notifications_received                    Notification[]          @relation("notification_recipient_user")
+  notifications_created                     Notification[]          @relation("notification_created_by_user")
+  report_exports_requested                  ReportExport[]          @relation("report_export_requested_by_user")
+  app_settings_updated                      AppSetting[]            @relation("app_setting_updated_by_user")
+  account_invitations_invited               AccountInvitation[]     @relation("account_invitation_invited_by_user")
+  account_invitations_accepted              AccountInvitation[]     @relation("account_invitation_accepted_by_user")
+  audit_logs                                AuditLog[]              @relation("audit_log_actor_user")
+
+  @@index([status])
+  @@index([status, last_name, first_name])
+  @@map("users")
+}
+
+model Role {
+  id                  String              @id @default(uuid()) @db.Uuid
+  code                String              @unique @db.VarChar(64)
+  name                String              @db.VarChar(128)
+  description         String?             @db.Text
+  is_system           Boolean             @default(true)
+  created_at          DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime            @updatedAt @db.Timestamptz(6)
+  user_roles          UserRole[]
+  account_invitations AccountInvitation[] @relation("account_invitation_role")
+
+  @@map("roles")
+}
+
+model UserRole {
+  user_id            String     @db.Uuid
+  role_id            String     @db.Uuid
+  granted_by_user_id String?    @db.Uuid
+  status             LinkStatus @default(ACTIVE)
+  granted_at         DateTime   @default(now()) @db.Timestamptz(6)
+  revoked_at         DateTime?  @db.Timestamptz(6)
+  version            Int        @default(1)
+
+  user            User  @relation("user_role_user", fields: [user_id], references: [id], onDelete: Cascade)
+  role            Role  @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  granted_by_user User? @relation("user_role_granted_by", fields: [granted_by_user_id], references: [id], onDelete: SetNull)
+
+  @@id([user_id, role_id])
+  @@index([role_id])
+  @@index([granted_by_user_id])
+  @@index([status])
+  @@map("user_roles")
+}
+
+model Artist {
+  id               String       @id @default(uuid()) @db.Uuid
+  user_id          String?      @unique @db.Uuid
+  legal_first_name String       @db.VarChar(100)
+  legal_last_name  String       @db.VarChar(100)
+  preferred_name   String?      @db.VarChar(120)
+  stage_name       String?      @db.VarChar(120)
+  date_of_birth    DateTime     @db.Date
+  status           RecordStatus @default(ACTIVE)
+  notes            String?      @db.Text
+  version          Int          @default(1)
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime     @updatedAt @db.Timestamptz(6)
+  archived_at      DateTime?    @db.Timestamptz(6)
+
+  user                              User?                   @relation("artist_user", fields: [user_id], references: [id], onDelete: SetNull)
+  artist_guardians_artist           ArtistGuardian[]        @relation("artist_guardian_artist")
+  coach_artist_assignments_artist   CoachArtistAssignment[] @relation("coach_assignment_artist")
+  activity_enrollments_artist       ActivityEnrollment[]    @relation("activity_enrollment_artist")
+  performance_records_artist        PerformanceRecord[]     @relation("performance_record_artist")
+  injury_records_artist             InjuryRecord[]          @relation("injury_record_artist")
+  medical_profile                   MedicalProfile?         @relation("medical_profile_artist")
+  emergency_contacts_artist         EmergencyContact[]      @relation("emergency_contact_artist")
+  consent_records_artist            ConsentRecord[]         @relation("consent_record_artist")
+  account_invitations_target_artist AccountInvitation[]     @relation("account_invitation_target_artist")
+
+  @@index([legal_last_name, legal_first_name])
+  @@index([stage_name])
+  @@index([status])
+  @@map("artists")
+}
+
+model ArtistGuardian {
+  artist_id          String           @db.Uuid
+  guardian_user_id   String           @db.Uuid
+  relationship_type  RelationshipType
+  is_primary         Boolean          @default(false)
+  status             LinkStatus       @default(ACTIVE)
+  granted_by_user_id String?          @db.Uuid
+  granted_at         DateTime         @default(now()) @db.Timestamptz(6)
+  revoked_at         DateTime?        @db.Timestamptz(6)
+  notes              String?          @db.Text
+  version            Int              @default(1)
+
+  artist          Artist @relation("artist_guardian_artist", fields: [artist_id], references: [id], onDelete: Cascade)
+  guardian_user   User   @relation("artist_guardian_guardian_user", fields: [guardian_user_id], references: [id], onDelete: Cascade)
+  granted_by_user User?  @relation("artist_guardian_granted_by_user", fields: [granted_by_user_id], references: [id], onDelete: SetNull)
+
+  @@id([artist_id, guardian_user_id])
+  @@index([guardian_user_id])
+  @@index([granted_by_user_id])
+  @@index([status])
+  @@map("artist_guardians")
+}
+
+model CoachArtistAssignment {
+  artist_id           String     @db.Uuid
+  coach_user_id       String     @db.Uuid
+  is_primary          Boolean    @default(false)
+  status              LinkStatus @default(ACTIVE)
+  assigned_by_user_id String?    @db.Uuid
+  assigned_at         DateTime   @default(now()) @db.Timestamptz(6)
+  revoked_at          DateTime?  @db.Timestamptz(6)
+  notes               String?    @db.Text
+  version             Int        @default(1)
+
+  artist           Artist @relation("coach_assignment_artist", fields: [artist_id], references: [id], onDelete: Cascade)
+  coach_user       User   @relation("coach_assignment_coach_user", fields: [coach_user_id], references: [id], onDelete: Cascade)
+  assigned_by_user User?  @relation("coach_assignment_assigned_by_user", fields: [assigned_by_user_id], references: [id], onDelete: SetNull)
+
+  @@id([artist_id, coach_user_id])
+  @@index([coach_user_id])
+  @@index([assigned_by_user_id])
+  @@index([status])
+  @@map("coach_artist_assignments")
+}
+
+model Activity {
+  id                   String               @id @default(uuid()) @db.Uuid
+  title                String               @db.VarChar(200)
+  kind                 ActivityKind
+  description          String?              @db.Text
+  location             String?              @db.VarChar(200)
+  timezone             String?              @db.VarChar(64)
+  starts_at            DateTime             @db.Timestamptz(6)
+  ends_at              DateTime             @db.Timestamptz(6)
+  capacity             Int?
+  status               ActivityStatus       @default(SCHEDULED)
+  version              Int                  @default(1)
+  created_at           DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime             @updatedAt @db.Timestamptz(6)
+  archived_at          DateTime?            @db.Timestamptz(6)
+  activity_enrollments ActivityEnrollment[] @relation("activity_enrollment_activity")
+  performance_records  PerformanceRecord[]  @relation("performance_record_activity")
+  injury_records       InjuryRecord[]       @relation("injury_record_activity")
+
+  @@index([kind, starts_at])
+  @@index([status, starts_at])
+  @@map("activities")
+}
+
+model ActivityEnrollment {
+  activity_id         String           @db.Uuid
+  artist_id           String           @db.Uuid
+  status              EnrollmentStatus @default(ENROLLED)
+  is_primary          Boolean          @default(false)
+  enrolled_at         DateTime         @default(now()) @db.Timestamptz(6)
+  withdrawn_at        DateTime?        @db.Timestamptz(6)
+  completed_at        DateTime?        @db.Timestamptz(6)
+  assigned_by_user_id String?          @db.Uuid
+  notes               String?          @db.Text
+  version             Int              @default(1)
+
+  activity           Activity           @relation("activity_enrollment_activity", fields: [activity_id], references: [id], onDelete: Cascade)
+  artist             Artist             @relation("activity_enrollment_artist", fields: [artist_id], references: [id], onDelete: Cascade)
+  assigned_by_user   User?              @relation("activity_enrollment_assigned_by_user", fields: [assigned_by_user_id], references: [id], onDelete: SetNull)
+  attendance_records AttendanceRecord[] @relation("attendance_record_enrollment")
+
+  @@id([activity_id, artist_id])
+  @@index([artist_id])
+  @@index([assigned_by_user_id])
+  @@index([status])
+  @@map("activity_enrollments")
+}
+
+model AttendanceRecord {
+  id                  String           @id @default(uuid()) @db.Uuid
+  activity_id         String           @db.Uuid
+  artist_id           String           @db.Uuid
+  status              AttendanceStatus @default(PENDING)
+  check_in_at         DateTime?        @db.Timestamptz(6)
+  check_out_at        DateTime?        @db.Timestamptz(6)
+  recorded_by_user_id String?          @db.Uuid
+  recorded_at         DateTime         @default(now()) @db.Timestamptz(6)
+  notes               String?          @db.Text
+  version             Int              @default(1)
+
+  enrollment       ActivityEnrollment @relation("attendance_record_enrollment", fields: [activity_id, artist_id], references: [activity_id, artist_id], onDelete: Restrict)
+  recorded_by_user User?              @relation("attendance_record_recorded_by_user", fields: [recorded_by_user_id], references: [id], onDelete: SetNull)
+
+  @@unique([activity_id, artist_id])
+  @@index([artist_id, recorded_at])
+  @@index([status, recorded_at])
+  @@index([recorded_by_user_id])
+  @@map("attendance_records")
+}
+
+model PerformanceRecord {
+  id                  String          @id @default(uuid()) @db.Uuid
+  artist_id           String          @db.Uuid
+  activity_id         String?         @db.Uuid
+  kind                PerformanceKind
+  performed_at        DateTime        @db.Timestamptz(6)
+  score               Decimal?        @db.Decimal(5, 2)
+  notes               String?         @db.Text
+  recorded_by_user_id String?         @db.Uuid
+  version             Int             @default(1)
+  created_at          DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime        @updatedAt @db.Timestamptz(6)
+
+  artist           Artist    @relation("performance_record_artist", fields: [artist_id], references: [id], onDelete: Restrict)
+  activity         Activity? @relation("performance_record_activity", fields: [activity_id], references: [id], onDelete: SetNull)
+  recorded_by_user User?     @relation("performance_record_recorded_by_user", fields: [recorded_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([artist_id, performed_at])
+  @@index([activity_id])
+  @@index([recorded_by_user_id])
+  @@map("performance_records")
+}
+
+model InjuryRecord {
+  id                  String        @id @default(uuid()) @db.Uuid
+  artist_id           String        @db.Uuid
+  activity_id         String?       @db.Uuid
+  incident_at         DateTime      @db.Timestamptz(6)
+  body_area           String        @db.VarChar(120)
+  severity            SeverityLevel
+  status              InjuryStatus  @default(OPEN)
+  description         String        @db.Text
+  immediate_action    String?       @db.Text
+  recovery_summary    String?       @db.Text
+  follow_up_due_at    DateTime?     @db.Timestamptz(6)
+  reported_by_user_id String?       @db.Uuid
+  reviewed_by_user_id String?       @db.Uuid
+  version             Int           @default(1)
+  created_at          DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime      @updatedAt @db.Timestamptz(6)
+
+  artist           Artist    @relation("injury_record_artist", fields: [artist_id], references: [id], onDelete: Restrict)
+  activity         Activity? @relation("injury_record_activity", fields: [activity_id], references: [id], onDelete: SetNull)
+  reported_by_user User?     @relation("injury_record_reported_by_user", fields: [reported_by_user_id], references: [id], onDelete: SetNull)
+  reviewed_by_user User?     @relation("injury_record_reviewed_by_user", fields: [reviewed_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([artist_id, incident_at])
+  @@index([activity_id])
+  @@index([reported_by_user_id])
+  @@index([reviewed_by_user_id])
+  @@index([status, incident_at])
+  @@map("injury_records")
+}
+
+model MedicalProfile {
+  id                      String       @id @default(uuid()) @db.Uuid
+  artist_id               String       @unique @db.Uuid
+  primary_physician_name  String?      @db.VarChar(160)
+  primary_physician_phone String?      @db.VarChar(32)
+  medical_notes           String?      @db.Text
+  emergency_instructions  String?      @db.Text
+  status                  RecordStatus @default(ACTIVE)
+  version                 Int          @default(1)
+  created_at              DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime     @updatedAt @db.Timestamptz(6)
+  archived_at             DateTime?    @db.Timestamptz(6)
+
+  artist              Artist              @relation("medical_profile_artist", fields: [artist_id], references: [id], onDelete: Cascade)
+  medical_allergies   MedicalAllergy[]    @relation("medical_allergy_profile")
+  medical_conditions  MedicalCondition[]  @relation("medical_condition_profile")
+  medical_medications MedicalMedication[] @relation("medical_medication_profile")
+
+  @@index([status])
+  @@map("medical_profiles")
+}
+
+model MedicalAllergy {
+  id                 String         @id @default(uuid()) @db.Uuid
+  medical_profile_id String         @db.Uuid
+  allergen_name      String         @db.VarChar(160)
+  reaction           String?        @db.Text
+  severity           SeverityLevel?
+  status             RecordStatus   @default(ACTIVE)
+  notes              String?        @db.Text
+  version            Int            @default(1)
+  created_at         DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime       @updatedAt @db.Timestamptz(6)
+  archived_at        DateTime?      @db.Timestamptz(6)
+
+  medical_profile MedicalProfile @relation("medical_allergy_profile", fields: [medical_profile_id], references: [id], onDelete: Cascade)
+
+  @@unique([medical_profile_id, allergen_name])
+  @@index([medical_profile_id])
+  @@index([status])
+  @@map("medical_allergies")
+}
+
+model MedicalCondition {
+  id                 String         @id @default(uuid()) @db.Uuid
+  medical_profile_id String         @db.Uuid
+  condition_name     String         @db.VarChar(160)
+  diagnosed_at       DateTime?      @db.Date
+  severity           SeverityLevel?
+  status             RecordStatus   @default(ACTIVE)
+  notes              String?        @db.Text
+  version            Int            @default(1)
+  created_at         DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime       @updatedAt @db.Timestamptz(6)
+  archived_at        DateTime?      @db.Timestamptz(6)
+
+  medical_profile MedicalProfile @relation("medical_condition_profile", fields: [medical_profile_id], references: [id], onDelete: Cascade)
+
+  @@unique([medical_profile_id, condition_name])
+  @@index([medical_profile_id])
+  @@index([status])
+  @@map("medical_conditions")
+}
+
+model MedicalMedication {
+  id                 String       @id @default(uuid()) @db.Uuid
+  medical_profile_id String       @db.Uuid
+  medication_name    String       @db.VarChar(160)
+  dosage             String?      @db.VarChar(120)
+  schedule           String?      @db.VarChar(160)
+  prescribed_by      String?      @db.VarChar(160)
+  status             RecordStatus @default(ACTIVE)
+  notes              String?      @db.Text
+  version            Int          @default(1)
+  created_at         DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime     @updatedAt @db.Timestamptz(6)
+  archived_at        DateTime?    @db.Timestamptz(6)
+
+  medical_profile MedicalProfile @relation("medical_medication_profile", fields: [medical_profile_id], references: [id], onDelete: Cascade)
+
+  @@unique([medical_profile_id, medication_name])
+  @@index([medical_profile_id])
+  @@index([status])
+  @@map("medical_medications")
+}
+
+model EmergencyContact {
+  id                String           @id @default(uuid()) @db.Uuid
+  artist_id         String           @db.Uuid
+  contact_name      String           @db.VarChar(160)
+  relationship_type RelationshipType
+  phone             String           @db.VarChar(32)
+  email             String?          @db.VarChar(320)
+  priority_order    Int
+  is_primary        Boolean          @default(false)
+  status            RecordStatus     @default(ACTIVE)
+  notes             String?          @db.Text
+  version           Int              @default(1)
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime         @updatedAt @db.Timestamptz(6)
+  archived_at       DateTime?        @db.Timestamptz(6)
+
+  artist Artist @relation("emergency_contact_artist", fields: [artist_id], references: [id], onDelete: Cascade)
+
+  @@unique([artist_id, priority_order])
+  @@index([artist_id, status])
+  @@map("emergency_contacts")
+}
+
+model ConsentRecord {
+  id                  String        @id @default(uuid()) @db.Uuid
+  artist_id           String        @db.Uuid
+  scope               ConsentScope
+  status              ConsentStatus @default(PENDING)
+  granted_by_user_id  String?       @db.Uuid
+  recorded_by_user_id String?       @db.Uuid
+  granted_at          DateTime?     @db.Timestamptz(6)
+  revoked_at          DateTime?     @db.Timestamptz(6)
+  expires_at          DateTime?     @db.Timestamptz(6)
+  policy_version      String?       @db.VarChar(32)
+  evidence_reference  String?       @db.VarChar(255)
+  notes               String?       @db.Text
+  version             Int           @default(1)
+  created_at          DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime      @updatedAt @db.Timestamptz(6)
+
+  artist           Artist @relation("consent_record_artist", fields: [artist_id], references: [id], onDelete: Restrict)
+  granted_by_user  User?  @relation("consent_record_granted_by_user", fields: [granted_by_user_id], references: [id], onDelete: SetNull)
+  recorded_by_user User?  @relation("consent_record_recorded_by_user", fields: [recorded_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([artist_id, scope])
+  @@index([granted_by_user_id])
+  @@index([recorded_by_user_id])
+  @@index([status, granted_at])
+  @@map("consent_records")
+}
+
+model Notification {
+  id                 String              @id @default(uuid()) @db.Uuid
+  recipient_user_id  String              @db.Uuid
+  created_by_user_id String?             @db.Uuid
+  context_type       String?             @db.VarChar(64)
+  context_id         String?             @db.VarChar(128)
+  category           String              @db.VarChar(64)
+  title              String              @db.VarChar(200)
+  body               String              @db.Text
+  payload            Json
+  channel            NotificationChannel @default(IN_APP)
+  status             NotificationStatus  @default(QUEUED)
+  sent_at            DateTime?           @db.Timestamptz(6)
+  delivered_at       DateTime?           @db.Timestamptz(6)
+  read_at            DateTime?           @db.Timestamptz(6)
+  expires_at         DateTime?           @db.Timestamptz(6)
+  version            Int                 @default(1)
+  created_at         DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime            @updatedAt @db.Timestamptz(6)
+
+  recipient_user  User  @relation("notification_recipient_user", fields: [recipient_user_id], references: [id], onDelete: Cascade)
+  created_by_user User? @relation("notification_created_by_user", fields: [created_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([recipient_user_id, status, created_at])
+  @@index([recipient_user_id, read_at])
+  @@index([context_type, context_id])
+  @@index([created_by_user_id])
+  @@map("notifications")
+}
+
+model ReportExport {
+  id                   String       @id @default(uuid()) @db.Uuid
+  requested_by_user_id String?      @db.Uuid
+  report_type          String       @db.VarChar(128)
+  filters              Json
+  format               ExportFormat
+  status               ExportStatus @default(QUEUED)
+  storage_key          String?      @db.VarChar(255)
+  file_name            String?      @db.VarChar(255)
+  row_count            Int?
+  expires_at           DateTime?    @db.Timestamptz(6)
+  completed_at         DateTime?    @db.Timestamptz(6)
+  version              Int          @default(1)
+  created_at           DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime     @updatedAt @db.Timestamptz(6)
+
+  requested_by_user User? @relation("report_export_requested_by_user", fields: [requested_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([requested_by_user_id, created_at])
+  @@index([status, created_at])
+  @@map("report_exports")
+}
+
+model AppSetting {
+  scope              SettingScope
+  setting_key        String       @db.VarChar(128)
+  setting_value      Json
+  is_sensitive       Boolean      @default(false)
+  updated_by_user_id String?      @db.Uuid
+  version            Int          @default(1)
+  created_at         DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime     @updatedAt @db.Timestamptz(6)
+
+  updated_by_user User? @relation("app_setting_updated_by_user", fields: [updated_by_user_id], references: [id], onDelete: SetNull)
+
+  @@id([scope, setting_key])
+  @@index([updated_by_user_id])
+  @@map("app_settings")
+}
+
+model AccountInvitation {
+  id                  String           @id @default(uuid()) @db.Uuid
+  email               String           @db.VarChar(320)
+  invited_role_id     String           @db.Uuid
+  invited_by_user_id  String?          @db.Uuid
+  target_artist_id    String?          @db.Uuid
+  status              InvitationStatus @default(PENDING)
+  token_hash          String           @unique @db.VarChar(255)
+  expires_at          DateTime         @db.Timestamptz(6)
+  accepted_at         DateTime?        @db.Timestamptz(6)
+  accepted_by_user_id String?          @db.Uuid
+  revoked_at          DateTime?        @db.Timestamptz(6)
+  notes               String?          @db.Text
+  version             Int              @default(1)
+  created_at          DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime         @updatedAt @db.Timestamptz(6)
+
+  invited_role     Role    @relation("account_invitation_role", fields: [invited_role_id], references: [id], onDelete: Restrict)
+  invited_by_user  User?   @relation("account_invitation_invited_by_user", fields: [invited_by_user_id], references: [id], onDelete: SetNull)
+  target_artist    Artist? @relation("account_invitation_target_artist", fields: [target_artist_id], references: [id], onDelete: SetNull)
+  accepted_by_user User?   @relation("account_invitation_accepted_by_user", fields: [accepted_by_user_id], references: [id], onDelete: SetNull)
+
+  @@index([email, status])
+  @@index([expires_at])
+  @@index([invited_by_user_id])
+  @@index([target_artist_id])
+  @@index([accepted_by_user_id])
+  @@map("account_invitations")
+}
+
+model AuditLog {
+  id                 BigInt       @id @default(autoincrement())
+  occurred_at        DateTime     @default(now()) @db.Timestamptz(6)
+  actor_user_id      String?      @db.Uuid
+  actor_user_email   String?      @db.VarChar(320)
+  actor_display_name String?      @db.VarChar(160)
+  actor_role_code    String       @db.VarChar(64)
+  action             String       @db.VarChar(128)
+  entity_type        String       @db.VarChar(128)
+  entity_id          String       @db.VarChar(128)
+  entity_version     Int?
+  outcome            AuditOutcome @default(SUCCESS)
+  request_id         String?      @db.Uuid
+  ip_address         String?      @db.VarChar(45)
+  user_agent         String?      @db.Text
+  before_data        Json?
+  after_data         Json?
+  metadata           Json?
+
+  actor_user User? @relation("audit_log_actor_user", fields: [actor_user_id], references: [id], onDelete: SetNull)
+
+  @@index([occurred_at])
+  @@index([actor_user_id, occurred_at])
+  @@index([entity_type, entity_id])
+  @@index([action, occurred_at])
+  @@map("audit_logs")
+}
