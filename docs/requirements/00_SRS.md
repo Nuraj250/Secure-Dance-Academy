@@ -40,16 +40,19 @@ The requirements baseline supports:
 
 ## Scope
 
-In scope:
+The detailed scope, exclusions, assumptions, constraints, success criteria, acceptance
+criteria, and revision history are documented in the supporting files listed below.
 
-- Authentication and session management
+High-level in-scope areas:
+
+- Secure authentication and controlled onboarding
 - User, role, artist, parent, and coach management
 - Attendance, performance, injury, medical, and activity records
-- Notifications, reports, dashboard views, settings, and audit logs
+- Notifications, reports, dashboards, settings, and audit logs
 - Search, filtering, pagination, and export
 - Privacy, security, and legal obligations needed for the application domain
 
-Out of scope for Task 02:
+High-level exclusions for Task 02:
 
 - Multi-academy tenancy
 - Payment processing
@@ -61,44 +64,19 @@ Out of scope for Task 02:
 ## Key Requirement Decisions
 
 - The system supports one academy baseline with future expansion left open.
+- Registration is controlled rather than public self-service.
 - Adult artists may have direct accounts; child artists are treated as protected
   dependent profiles managed by authorized adults.
 - The system is responsible for sensitive recordkeeping, not just convenience.
 - Security, privacy, and auditability are first-class requirements, not add-ons.
 - Requirements are written to be measurable and testable, not descriptive only.
 
-## Assumptions
+## Supporting Documents
 
-- Users access the system with modern browsers and stable network connectivity.
-- The organization assigns roles and relationships centrally.
-- Sensitive records require authorization before disclosure.
-- The approved authentication and platform architecture from Task 01 remain fixed.
-
-## Constraints
-
-- The approved architecture from Task 01 must not be redesigned.
-- No business feature implementation occurs in Task 02.
-- Requirements must remain traceable to future tests and formal models.
-- The system must satisfy secure software engineering expectations and academic
-  assessment requirements.
-
-## Success Criteria
-
-- Every stakeholder is represented.
-- Every important feature has a measurable requirement.
-- Security, privacy, and legal expectations are explicitly defined.
-- Business rules are consistent and enforceable.
-- Traceability exists from requirements to later verification.
-- The requirements package is suitable for architecture design.
-
-## Acceptance Criteria
-
-- Requirements are numbered and unambiguous.
-- No conflicting requirement statements remain unresolved.
-- Security requirements are complete enough to guide architecture.
-- Business rules are clearly separated from implementation detail.
-- Supporting documents cover stakeholder analysis, risk, STRIDE, and traceability.
-
-## Revision History
-
-- 2026-06-28: Initial requirements baseline created for Task 02.
+- [System Scope](./16_SYSTEM_SCOPE.md)
+- [Out of Scope](./17_OUT_OF_SCOPE.md)
+- [Assumptions](./18_ASSUMPTIONS.md)
+- [Constraints](./19_CONSTRAINTS.md)
+- [Success Criteria](./20_SUCCESS_CRITERIA.md)
+- [Acceptance Criteria](./21_ACCEPTANCE_CRITERIA.md)
+- [Revision History](./22_REVISION_HISTORY.md)

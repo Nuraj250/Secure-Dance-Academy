@@ -3,6 +3,7 @@
 | Requirement Area | Key IDs | Business Goal | Verification | Formal Method | Report Section |
 | --- | --- | --- | --- | --- | --- |
 | Authentication and access | FR-01, FR-02, FR-03, SR-01, SR-02, SR-03, SR-04 | Secure access and safeguarding | Auth tests, authorization tests, session tests | Authentication FSM | Security and Testing |
+| Controlled onboarding | FR-22, BR-11, BRULE-11, SR-13 | Safe account creation | Onboarding and password policy tests | Registration and access-control model | Requirements and Security |
 | User and role management | FR-04, FR-05, BRULE-06 | Controlled administration | Role management tests | Role assignment FSM | Requirements and Security |
 | Artist, parent, coach relationships | FR-06, FR-07, FR-08, BRULE-01, BRULE-02, BRULE-07 | Accurate academy relationships | Relationship tests, permission tests | Reachability model | Requirements and Database |
 | Attendance | FR-09, BRULE-03, BRULE-07, NFR-01 | Reliable attendance records | Integration and regression tests | Attendance FSM and Petri net | Requirements and Formal Methods |

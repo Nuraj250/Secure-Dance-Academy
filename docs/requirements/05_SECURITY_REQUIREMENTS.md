@@ -14,6 +14,7 @@
 | SR-10 | The system shall use encrypted transport for all protected interactions. | Protects data in transit. | Traffic cannot be read or altered in transit. |
 | SR-11 | The system shall support security testing and review for authentication, authorization, input handling, and session controls. | Confirms controls work in practice. | Security evidence exists before release. |
 | SR-12 | The system shall align with OWASP and NIST-aligned secure software practices. | Reduces common web application risk. | Security controls are consistent with accepted practice. |
+| SR-13 | The system shall enforce an organization-approved password policy for user credentials and reject weak passwords. | Reduces account compromise risk. | Passwords must meet minimum length and strength rules before acceptance. |
 
 ## Security Requirement Notes
 

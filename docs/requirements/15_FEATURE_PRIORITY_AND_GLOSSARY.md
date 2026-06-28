@@ -5,6 +5,8 @@
 | Feature | Priority |
 | --- | --- |
 | Sign in, sign out, and session control | Must |
+| Password recovery and reset | Must |
+| Controlled account onboarding | Must |
 | User and role management | Must |
 | Artist, parent, and coach relationships | Must |
 | Attendance recording | Must |

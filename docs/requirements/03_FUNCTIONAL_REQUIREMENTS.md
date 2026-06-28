@@ -23,6 +23,7 @@
 | FR-19 | The system shall allow users to view and update their own profile data where permitted. | Must | Account records | A user can keep own profile information current. | Self-service must not expose privileged data. |
 | FR-20 | The system shall allow administrators to configure application settings. | Should | Settings records | Settings changes persist and are reviewable. | Settings changes are restricted and audited. |
 | FR-21 | The system shall allow authorized users to export permitted records. | Should | Reporting and record views | Export produces the expected subset of data. | Exports must not include unauthorized information. |
+| FR-22 | The system shall allow authorized administrators to create or approve new user accounts through controlled onboarding. | Must | Authentication service, user management, role assignment | An authorized administrator can create or approve a new account, and the account remains inactive until assigned. | Public self-registration is disabled unless explicitly approved and onboarding is audited. |
 
 ## Functional Requirement Notes
 

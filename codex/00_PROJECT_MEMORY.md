@@ -19,7 +19,7 @@ completed task and kept as the single source of truth for project progress.
 - Authentication: Supabase Authentication
 - Deployment: Vercel, Docker, Docker Compose
 - Testing: Jest, Playwright, OWASP ZAP, SonarQube
-- Status: Planning Phase completed, Task 01 completed, Task 02 completed
+- Status: Planning Phase completed, Task 01 completed, Task 02 completed, Task 03 completed
 
 ## Project Goals
 
@@ -33,7 +33,7 @@ completed task and kept as the single source of truth for project progress.
 
 - Project Planning: Completed
 - Requirements Engineering: Completed
-- Architecture Design: Not Started
+- Architecture Design: Completed
 - Database Design: Not Started
 - UI Design: Not Started
 - Backend Development: Not Started
@@ -41,7 +41,7 @@ completed task and kept as the single source of truth for project progress.
 - Security Implementation: Not Started
 - Testing: Not Started
 - Formal Methods: Not Started
-- Documentation: Not Started
+- Documentation: In progress
 - Deployment: Not Started
 - Final Review: Not Started
 
@@ -64,6 +64,7 @@ completed task and kept as the single source of truth for project progress.
 - Project Memory
 - Project Initialization Task 01 completed
 - Requirements Engineering Task 02 completed
+- Architecture Design Task 03 completed
 
 ## Approved Technologies
 
@@ -149,17 +150,21 @@ completed task and kept as the single source of truth for project progress.
 ## Approved Requirements Baseline
 
 - Single-academy baseline with future expansion left open.
+- Controlled account onboarding is in scope; public self-registration is out of scope.
 - Administrator, coach, parent, and artist workflows are in scope.
 - Child artist profiles are treated as protected dependent profiles managed by
   authorized adults.
 - Attendance, performance, injury, medical, activity, report, dashboard, settings,
   audit, search, filtering, pagination, and export requirements are in scope.
+- Login, logout, password recovery, and password policy requirements are explicitly
+  defined.
 - Payments, mobile apps, multi-academy tenancy, AI assistance, and public marketing
   pages remain out of scope for the requirements baseline.
 
 ## Requirements Phase Risks
 
 - Child and medical data must remain tightly protected.
+- Controlled onboarding and password policy must remain explicit requirements.
 - Scope creep must be controlled before architecture begins.
 - Future decisions for notifications, email delivery, and backup automation remain
   open and should not leak into the current baseline.
@@ -187,6 +192,12 @@ completed task and kept as the single source of truth for project progress.
 ## Architecture Decision Record
 
 - Decision 0001: Project Initialization Foundation accepted on 2026-06-28.
+- Decision 0002: Feature-Based Clean Architecture accepted on 2026-06-28.
+- Decision 0003: Supabase Auth and secure cookie sessions accepted on 2026-06-28.
+- Decision 0004: Prisma repository data layer accepted on 2026-06-28.
+- Decision 0005: Server Components first UI strategy accepted on 2026-06-28.
+- Decision 0006: Security middleware, validation, and audit logging accepted on 2026-06-28.
+- Decision 0007: Vercel and Docker deployment boundary accepted on 2026-06-28.
 
 ## Feature Progress
 
@@ -196,14 +207,14 @@ completed task and kept as the single source of truth for project progress.
 ## Deliverable Progress
 
 - Requirements: Completed
-- Architecture: Pending
+- Architecture: Completed
 - Database: Pending
 - Frontend: Pending
 - Backend: Pending
 - Security: Pending
 - Testing: Pending
 - Formal Methods: Pending
-- Documentation: Pending
+- Documentation: In progress
 - Deployment: Pending
 - Presentation: Pending
 - Final Report: Pending
@@ -226,17 +237,17 @@ completed task and kept as the single source of truth for project progress.
 
 ## Next Task
 
-- Current Phase: Requirements Engineering Complete
-- Next Phase: System Architecture
-- Primary Owner: Solution Architect
-- Expected Deliverables: Architecture vision, component boundaries, data flow,
-  deployment design, and architecture decision records
+- Current Phase: System Architecture Complete
+- Next Phase: Database Design
+- Primary Owner: Database Architect
+- Expected Deliverables: Conceptual model, logical model, physical schema, ERD,
+  constraints, indexes, migrations, backup strategy, and restore strategy
 
 ## Project State
 
-- Overall Status: Task 02 completed
+- Overall Status: Task 03 completed
 - Engineering Team: Ready
-- Architecture: Pending
+- Architecture: Completed
 - Development: Not Started
 - Testing: Not Started
 - Documentation: In progress

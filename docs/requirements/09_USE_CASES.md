@@ -79,3 +79,33 @@
 - Exception flow: Attempted changes to audit history are rejected.
 - Postconditions: Audit evidence remains intact.
 - Security requirements: Immutability, restricted access, logging integrity.
+
+## UC-09 Controlled Account Onboarding
+
+- Actor: Administrator
+- Preconditions: The administrator is authenticated and authorized to create or approve accounts.
+- Main flow: The administrator creates or approves a new account and assigns the required role or relationship.
+- Alternative flow: The administrator saves the account for later activation.
+- Exception flow: Unauthorized onboarding attempts are rejected.
+- Postconditions: The account exists but remains controlled by approved onboarding rules.
+- Security requirements: Authorization, audit logging, disabled public self-registration.
+
+## UC-10 Password Recovery Request
+
+- Actor: User with an eligible account
+- Preconditions: The user has access to the account recovery channel.
+- Main flow: The user requests password recovery and the system issues a safe recovery path.
+- Alternative flow: The user cancels the request before it completes.
+- Exception flow: Invalid recovery attempts are rate limited and do not disclose account state.
+- Postconditions: A recovery path is available to the eligible user.
+- Security requirements: Rate limiting, safe messaging, audit logging.
+
+## UC-11 Password Reset Completion
+
+- Actor: User with an eligible recovery path
+- Preconditions: The user has a valid recovery token or approved reset path.
+- Main flow: The user submits a new password and the system updates credentials safely.
+- Alternative flow: The user abandons the reset before completion.
+- Exception flow: Expired or invalid tokens are rejected safely.
+- Postconditions: The account has a new password and the old path is invalidated.
+- Security requirements: Password policy, token expiration, session invalidation, audit logging.

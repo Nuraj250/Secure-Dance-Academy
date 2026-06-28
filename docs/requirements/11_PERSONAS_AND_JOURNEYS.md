@@ -12,7 +12,7 @@
 
 ## User Journeys
 
-### Registration and Access Setup
+### Controlled Account Onboarding
 
 1. An administrator creates or approves an account.
 2. The user receives credentials or a recovery path.
@@ -35,6 +35,46 @@ Improvement opportunities:
 - Clear validation
 - Controlled recovery
 - Guided role setup
+
+### Performance Tracking
+
+1. A coach opens the assigned artist list.
+2. The coach selects the artist and the performance context.
+3. The coach records the performance details.
+4. The system saves the entry and keeps it visible to permitted viewers.
+
+Pain points:
+
+- Slow navigation to the correct artist
+- Incomplete or inconsistent performance notes
+
+Security risks:
+
+- Access to unassigned artists
+- Exposure of non-permitted performance data
+
+Improvement opportunities:
+
+- Search, filters, and assignment-aware permissions
+
+### Logout
+
+1. The user selects sign out.
+2. The system ends the session and clears access.
+3. The user returns to a safe unauthenticated state.
+
+Pain points:
+
+- Unclear session end state
+- Users not knowing whether sign out completed
+
+Security risks:
+
+- Session reuse after sign out
+
+Improvement opportunities:
+
+- Clear confirmation and session expiration handling
 
 ### Attendance Recording
 

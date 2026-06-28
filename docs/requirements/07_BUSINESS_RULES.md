@@ -12,6 +12,7 @@
 | BRULE-08 | Performance and injury updates must be attributed to an accountable role. | Preserve provenance. |
 | BRULE-09 | Administrative settings changes are restricted to approved administrator roles. | Prevent configuration abuse. |
 | BRULE-10 | Search, filter, and export operations may only return data visible to the requesting role. | Prevent information leakage. |
+| BRULE-11 | New accounts are created only by authorized administrators or approved invitation workflows. Public self-registration is disabled. | Prevent unauthorized onboarding. |
 
 ## Business Rule Notes
 

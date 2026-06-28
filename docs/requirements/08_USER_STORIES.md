@@ -12,6 +12,8 @@
 | US-08 | As a user, I want to search and filter records so that I can find information quickly. | Search and filter return the expected subset. | Only authorized data is returned. |
 | US-09 | As an administrator, I want to generate reports so that I can make operational decisions. | Reports can be generated for permitted data sets. | Report output respects permissions. |
 | US-10 | As a user, I want to receive notifications so that I do not miss important changes. | Pending notifications are visible to me. | Notification content avoids sensitive leakage. |
+| US-11 | As an administrator, I want to create or approve new user accounts so that onboarding remains controlled. | A new account can be onboarded by an authorized administrator. | Public self-registration is disabled or tightly controlled. |
+| US-12 | As a user, I want to recover and reset my password so that I can regain access safely. | A recovery flow and reset flow are available for eligible users. | Recovery is rate limited, audited, and does not reveal other accounts. |
 
 ## User Story Notes
 

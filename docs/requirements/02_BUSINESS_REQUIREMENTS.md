@@ -12,6 +12,7 @@
 | BR-08 | The system shall support secure profile management and record updates. | Reduces support overhead and keeps data current. | Must |
 | BR-09 | The system shall support data retention, controlled deletion, and privacy obligations. | Reduces legal and compliance risk. | Must |
 | BR-10 | The system shall remain extensible for future expansion without redesign. | Protects long-term value and maintainability. | Should |
+| BR-11 | The system shall control account onboarding rather than allow open public self-registration. | Reduces unauthorized access risk. | Must |
 
 ## Business Requirement Notes
 
