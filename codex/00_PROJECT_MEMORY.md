@@ -19,7 +19,7 @@ completed task and kept as the single source of truth for project progress.
 - Authentication: Supabase Authentication
 - Deployment: Vercel, Docker, Docker Compose
 - Testing: Jest, Playwright, OWASP ZAP, SonarQube
-- Status: Planning Phase completed, Task 01 completed, Task 02 completed, Task 03 completed, Task 04 completed, Task 05 completed, Task 06 completed, Task 07 completed, Task 08 completed, Task 09 completed
+- Status: Planning Phase completed, Task 01 completed, Task 02 completed, Task 03 completed, Task 04 completed, Task 05 completed, Task 06 completed, Task 07 completed, Task 08 completed, Task 09 completed, Task 10 completed
 
 ## Project Goals
 
@@ -40,7 +40,7 @@ completed task and kept as the single source of truth for project progress.
 - Frontend Development: Completed
 - Security Implementation: Completed
 - Testing: Completed
-- Formal Methods: Not Started
+- Formal Methods: Completed
 - Documentation: In progress
 - Deployment: Not Started
 - Final Review: Not Started
@@ -89,6 +89,11 @@ completed task and kept as the single source of truth for project progress.
 - Test Evidence completed
 - Coverage Summary completed
 - Final QA Report completed
+- Formal Methods README completed
+- Formal Specification completed
+- Verification Evidence completed
+- Traceability completed
+- Formal Review Report completed
 
 ## Approved Technologies
 
@@ -244,7 +249,7 @@ completed task and kept as the single source of truth for project progress.
 - Backend: Completed
 - Security: Completed
 - Testing: Completed
-- Formal Methods: Pending
+- Formal Methods: Completed
 - Documentation: In progress
 - Deployment: Pending
 - Presentation: Pending
@@ -320,6 +325,22 @@ completed task and kept as the single source of truth for project progress.
 - Task 09 deliverables were validated with Jest passing, the core coverage
   summary recorded, and the testing documentation index updated for future QA
   work.
+- Task 10 now leaves the next phase easier by adding formal behavioural models,
+  invariants, Petri nets, trust-boundary verification, and a requirement-linked
+  traceability package for the highest-risk workflows.
+- The Task 10 model set covers authentication, password recovery, session
+  lifecycle, controlled onboarding, role assignment, attendance, protected
+  record access, and auditability.
+- The Task 10 review stayed at the behavioural level instead of inventing new
+  implementation details, and it preserved the approved architecture and
+  security controls as the basis for the models.
+- The formal-methods artefacts are documented in Markdown with Mermaid diagrams;
+  no separate model-checking tool was introduced in this workspace.
+- Task 10 deliverables were validated with npm run lint, typecheck, build, and
+  Jest passing, plus documentation cross-links and manual model consistency
+  review.
+- The validation run used the current Next.js 15.5.19 and Prisma Client 6.19.3
+  build toolchain already present in the workspace.
 
 ## Future Improvements
 
@@ -333,17 +354,18 @@ completed task and kept as the single source of truth for project progress.
 ## Next Task
 
 - Current Phase: Testing Complete
-- Next Phase: Formal Methods
-- Primary Owner: Formal Methods Engineer
-- Expected Deliverables: formal verification models, proofs, and review artifacts
+- Next Phase: Documentation & Final Report
+- Primary Owner: Technical Writer
+- Expected Deliverables: final documentation set, presentation material, and release-ready report
 
 ## Project State
 
-- Overall Status: Task 09 completed
+- Overall Status: Task 10 completed
 - Engineering Team: Ready
 - Architecture: Completed
 - Development: In progress
 - Testing: Completed
+- Formal Methods: Completed
 - Documentation: In progress
 - Final Review: Pending
 - Project Health: Good
