@@ -127,6 +127,7 @@ completed task and kept as the single source of truth for project progress.
 - SonarQube Execution Steps completed
 - Presentation Demo Script completed
 - Report Evidence Map completed
+- Final Submission Checklist completed
 
 ## Approved Technologies
 
@@ -390,6 +391,9 @@ completed task and kept as the single source of truth for project progress.
   coursework rubric without claiming unexecuted ZAP or SonarQube results.
 - The submission package is designed to separate completed local evidence from
   environment-dependent security analysis.
+- The final submission checklist records the current state of build, test,
+  documentation, security evidence, and formal methods readiness without adding
+  new product scope.
 
 ## Future Improvements
 

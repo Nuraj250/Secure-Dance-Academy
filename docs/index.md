@@ -29,6 +29,7 @@ reference for requirements, design, implementation, testing, and deployment.
 | Documentation Review | Task 11 acceptance review and deliverable matrix. | `docs/documentation-review.md` |
 | Final Review | Task 12 final engineering review, release notes, submission checklist, and approval report. | `docs/final-review/README.md`, `docs/final-review/FINAL_APPROVAL_REPORT.md` |
 | Submission | Coursework evidence package, rubric matrix, testing guide, scan steps, presentation script, and report evidence map. | `docs/submission/ASSIGNMENT_COMPLIANCE_MATRIX.md`, `docs/submission/TESTING_EVIDENCE_GUIDE.md`, `docs/submission/OWASP_ZAP_EXECUTION_STEPS.md`, `docs/submission/SONARQUBE_EXECUTION_STEPS.md`, `docs/submission/PRESENTATION_DEMO_SCRIPT.md`, `docs/submission/REPORT_EVIDENCE_MAP.md` |
+| Final Submission Checklist | Final verification summary and readiness checklist. | `docs/submission/FINAL_SUBMISSION_CHECKLIST.md` |
 | Decisions | Architecture Decision Records captured during the approved design phases. | `docs/decisions/*.md` |
 
 ## Navigation Notes
