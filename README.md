@@ -130,6 +130,7 @@ Key entry points:
 
 - Project index: `docs/index.md`
 - Final report: `docs/final-report.md`
+- Final review: `docs/final-review/README.md`
 - Developer guide: `docs/developer-guide.md`
 - Administrator guide: `docs/administrator-guide.md`
 - User guide: `docs/user-guide.md`

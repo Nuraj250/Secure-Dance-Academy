@@ -27,6 +27,7 @@ reference for requirements, design, implementation, testing, and deployment.
 | References | Harvard-style reference list. | `docs/references.md` |
 | Appendices | Evidence, diagram inventory, verification commands, and residual work summary. | `docs/appendices.md` |
 | Documentation Review | Task 11 acceptance review and deliverable matrix. | `docs/documentation-review.md` |
+| Final Review | Task 12 final engineering review, release notes, submission checklist, and approval report. | `docs/final-review/README.md`, `docs/final-review/FINAL_APPROVAL_REPORT.md` |
 | Decisions | Architecture Decision Records captured during the approved design phases. | `docs/decisions/*.md` |
 
 ## Navigation Notes
@@ -36,5 +37,5 @@ reference for requirements, design, implementation, testing, and deployment.
   code.
 - Use the backend, API, and security sections when modifying server logic.
 - Use the testing and deployment sections before release or environment changes.
-- Use the final report, references, appendices, and presentation notes for
-  submission preparation.
+- Use the final report, final review, references, appendices, and presentation
+  notes for submission preparation.
