@@ -6,3 +6,7 @@ export type PaginatedResult<TItem> = {
   pageSize: number;
   totalItems: number;
 };
+
+declare global {
+  var __secureDancePrisma: import("@prisma/client").PrismaClient | undefined;
+}

@@ -3,18 +3,34 @@ type RateLimitRecord = {
   resetAt: number;
 };
 
+export type RateLimitResult = {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+};
+
 const store = new Map<string, RateLimitRecord>();
+
+function cleanupExpiredEntries(now: number) {
+  for (const [key, value] of store.entries()) {
+    if (value.resetAt <= now) {
+      store.delete(key);
+    }
+  }
+}
 
 export function checkRateLimit(
   key: string,
   options: { limit: number; windowMs: number },
 ) {
   const now = Date.now();
+  cleanupExpiredEntries(now);
   const current = store.get(key);
 
   if (!current || current.resetAt <= now) {
-    store.set(key, { count: 1, resetAt: now + options.windowMs });
-    return { allowed: true, remaining: options.limit - 1 };
+    const resetAt = now + options.windowMs;
+    store.set(key, { count: 1, resetAt });
+    return { allowed: true, remaining: options.limit - 1, resetAt };
   }
 
   if (current.count >= options.limit) {
@@ -22,5 +38,17 @@ export function checkRateLimit(
   }
 
   current.count += 1;
-  return { allowed: true, remaining: options.limit - current.count };
+  return {
+    allowed: true,
+    remaining: options.limit - current.count,
+    resetAt: current.resetAt,
+  };
+}
+
+export function createRateLimitKey(...segments: Array<string | number | null | undefined>) {
+  return segments
+    .filter((segment): segment is string | number => segment != null)
+    .map((segment) => String(segment).trim().toLowerCase())
+    .filter((segment) => segment.length > 0)
+    .join(":");
 }

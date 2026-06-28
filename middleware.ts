@@ -1,22 +1,32 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { protectedRoutePrefixes } from "@/config/security";
+import {
+  protectedRoutePrefixes,
+  publicRoutePrefixes,
+} from "@/config/security";
 import { applySecurityHeaders } from "@/lib/security/headers";
+import { hasSupabaseSessionCookie } from "@/lib/security/cookies";
 
 function isProtectedPath(pathname: string) {
   return protectedRoutePrefixes.some((prefix) => pathname.startsWith(prefix));
+}
+
+function isPublicPath(pathname: string) {
+  return publicRoutePrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   applySecurityHeaders(response);
 
+  if (isPublicPath(request.nextUrl.pathname)) {
+    return response;
+  }
+
   if (!isProtectedPath(request.nextUrl.pathname)) {
     return response;
   }
 
-  const hasAuthCookie = request.cookies
-    .getAll()
-    .some((cookie) => cookie.name.startsWith("sb-"));
+  const hasAuthCookie = hasSupabaseSessionCookie(request.cookies.getAll());
 
   if (!hasAuthCookie) {
     const loginUrl = request.nextUrl.clone();

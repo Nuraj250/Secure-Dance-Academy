@@ -1,10 +1,18 @@
+import type { SessionUser } from "@/types/auth";
+import type { NavigationSection } from "@/lib/navigation";
+import type { ReactNode } from "react";
 import { MainNavigation } from "@/components/layout/main-navigation";
 
-export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) {
+type AppShellProps = {
+  user: SessionUser;
+  sections: NavigationSection[];
+  children: ReactNode;
+};
+
+export function AppShell({ user, sections, children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <MainNavigation />
-      <main>{children}</main>
-    </div>
+    <MainNavigation user={user} sections={sections}>
+      {children}
+    </MainNavigation>
   );
 }

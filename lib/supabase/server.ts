@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { env, hasSupabaseBrowserConfig } from "@/lib/env";
+import { normalizeSecureCookieOptions } from "@/lib/security/cookies";
 
 export async function createSupabaseServerClient() {
   if (!hasSupabaseBrowserConfig()) {
@@ -25,7 +26,11 @@ export async function createSupabaseServerClient() {
         },
         setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
+            cookieStore.set(
+              name,
+              value,
+              normalizeSecureCookieOptions(options),
+            );
           });
         },
       },

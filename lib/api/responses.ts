@@ -1,26 +1,38 @@
 import { NextResponse } from "next/server";
+import type {
+  ApiError,
+  ApiSuccess,
+  PaginatedResponse,
+} from "@/types/api";
 
-type SuccessBody<TData> = {
-  status: "success";
-  message: string;
-  data: TData;
-  metadata?: Record<string, unknown>;
-};
-
-type ErrorBody = {
-  status: "error";
-  errorCode: string;
-  message: string;
-  validationDetails?: Record<string, unknown>;
-};
+function applyNoStoreHeaders(response: NextResponse) {
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+  response.headers.set("Pragma", "no-cache");
+  return response;
+}
 
 export function successResponse<TData>(
   message: string,
   data: TData,
   metadata?: Record<string, unknown>,
+  status = 200,
 ) {
-  const body: SuccessBody<TData> = { status: "success", message, data, metadata };
-  return NextResponse.json(body);
+  const body: ApiSuccess<TData> = {
+    status: "success",
+    message,
+    data,
+    metadata,
+  };
+
+  return applyNoStoreHeaders(NextResponse.json(body, { status }));
+}
+
+export function paginatedSuccessResponse<TItem>(
+  message: string,
+  data: PaginatedResponse<TItem>,
+  metadata?: Record<string, unknown>,
+) {
+  return successResponse(message, data, metadata);
 }
 
 export function errorResponse(
@@ -29,11 +41,12 @@ export function errorResponse(
   status = 400,
   validationDetails?: Record<string, unknown>,
 ) {
-  const body: ErrorBody = {
+  const body: ApiError = {
     status: "error",
     errorCode,
     message,
     validationDetails,
   };
-  return NextResponse.json(body, { status });
+
+  return applyNoStoreHeaders(NextResponse.json(body, { status }));
 }

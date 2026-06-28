@@ -1,4 +1,4 @@
-import nextJest from "next/jest";
+const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
   dir: "./",
@@ -17,11 +17,12 @@ const config = {
   ],
   coverageDirectory: "coverage",
   coverageProvider: "v8",
+  modulePathIgnorePatterns: ["<rootDir>/.next/"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/tests/setup/jest.setup.ts"],
-  testEnvironment: "jsdom",
+  testEnvironment: "node",
 };
 
-export default createJestConfig(config);
+module.exports = createJestConfig(config);
