@@ -120,6 +120,13 @@ completed task and kept as the single source of truth for project progress.
 - Submission Checklist completed
 - Presentation Checklist completed
 - Final Approval Report completed
+- Submission Evidence Package completed
+- Assignment Compliance Matrix completed
+- Testing Evidence Guide completed
+- OWASP ZAP Execution Steps completed
+- SonarQube Execution Steps completed
+- Presentation Demo Script completed
+- Report Evidence Map completed
 
 ## Approved Technologies
 
@@ -379,6 +386,10 @@ completed task and kept as the single source of truth for project progress.
   documentation review records 0 outstanding Task 11 revisions.
 - Task 11 deliverables were validated with npm run lint, typecheck, build, and
   Jest passing after the documentation package was updated.
+- The submission evidence package maps the existing implementation to the
+  coursework rubric without claiming unexecuted ZAP or SonarQube results.
+- The submission package is designed to separate completed local evidence from
+  environment-dependent security analysis.
 
 ## Future Improvements
 
