@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { LoginForm } from "@/features/authentication/components/login-form";
 import { SessionService } from "@/features/authentication/services/session.service";
+import { getSupabaseConfigStatus } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Sign in | Secure Dance Academy",
@@ -18,6 +19,7 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await sessionService.resolveSession();
+  const supabaseConfig = getSupabaseConfigStatus();
 
   if (session.user) {
     redirect("/dashboard");
@@ -43,7 +45,20 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </span>
       }
     >
-      <LoginForm redirectTo={redirectTo} />
+      {supabaseConfig.isDevelopmentDemoMode ? (
+        <div className="mb-4 rounded-md border border-warning/40 bg-warning/10 p-4 text-sm">
+          <p className="font-semibold text-foreground">Local demo mode</p>
+          <p className="mt-1 leading-6 text-muted-foreground">
+            Supabase authentication is not configured, so the app is running in
+            a safe unauthenticated state. Add real Supabase values to
+            .env.local to enable sign-in.
+          </p>
+        </div>
+      ) : null}
+      <LoginForm
+        authUnavailable={supabaseConfig.isDevelopmentDemoMode}
+        redirectTo={redirectTo}
+      />
     </AuthShell>
   );
 }

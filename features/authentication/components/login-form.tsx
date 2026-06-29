@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { signInSchema, type SignInInput } from "@/features/authentication/schemas/auth.schema";
+import {
+  signInSchema,
+  type SignInInput,
+} from "@/features/authentication/schemas/auth.schema";
 import { signInAction } from "@/features/authentication/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,21 +14,39 @@ import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/ui/form-field";
 
 type LoginFormProps = {
+  authUnavailable?: boolean;
   redirectTo: string;
 };
 
 type FormState = Partial<Record<keyof SignInInput | "root", string>>;
 
-export function LoginForm({ redirectTo }: LoginFormProps) {
+export function LoginForm({
+  authUnavailable = false,
+  redirectTo,
+}: LoginFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errors, setErrors] = useState<FormState>({});
+  let submitLabel = "Sign in";
+  if (authUnavailable) {
+    submitLabel = "Config required";
+  } else if (isPending) {
+    submitLabel = "Signing in...";
+  }
 
   return (
     <form
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
+        if (authUnavailable) {
+          setErrors({
+            root:
+              "Supabase authentication is not configured for this local demo.",
+          });
+          return;
+        }
+
         const form = new FormData(event.currentTarget);
         const candidate = {
           email: String(form.get("email") ?? ""),
@@ -76,6 +97,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         <Input
           autoComplete="email"
           defaultValue=""
+          disabled={authUnavailable}
           id="email"
           name="email"
           placeholder="name@example.com"
@@ -90,6 +112,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       >
         <Input
           autoComplete="current-password"
+          disabled={authUnavailable}
           id="password"
           name="password"
           placeholder="Enter your password"
@@ -100,11 +123,10 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         <a className="text-sm text-primary underline-offset-4 hover:underline" href="/forgot-password">
           Forgot password?
         </a>
-        <Button disabled={isPending} type="submit">
-          {isPending ? "Signing in..." : "Sign in"}
+        <Button disabled={authUnavailable || isPending} type="submit">
+          {submitLabel}
         </Button>
       </div>
     </form>
   );
 }
-

@@ -4,6 +4,11 @@ import { spawnSync } from "node:child_process";
 
 const projectRoot = process.cwd();
 const driveLetters = ["X", "Y", "Z", "W", "V"];
+const windowsPathMappingThreshold = 180;
+
+function shouldUseDriveMapping(root) {
+  return process.platform === "win32" && root.length > windowsPathMappingThreshold;
+}
 
 function createDriveMapping(root) {
   for (const letter of driveLetters) {
@@ -28,8 +33,9 @@ function removeDriveMapping(mappedRoot) {
   });
 }
 
-const mappedRoot =
-  process.platform === "win32" ? createDriveMapping(projectRoot) : projectRoot;
+const mappedRoot = shouldUseDriveMapping(projectRoot)
+  ? createDriveMapping(projectRoot)
+  : projectRoot;
 const shouldRemoveMapping = mappedRoot !== projectRoot;
 const tempRoot = path.join(mappedRoot, ".tmp", "build");
 const profileRoot = path.join(mappedRoot, ".tmp", "profile");

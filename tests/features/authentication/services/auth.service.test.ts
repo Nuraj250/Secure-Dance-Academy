@@ -1,9 +1,22 @@
-import { AccountPendingError, AuthenticationError } from "@/lib/http/errors";
+import {
+  AccountPendingError,
+  AuthenticationError,
+  ServiceUnavailableError,
+} from "@/lib/http/errors";
+import { isDevelopmentSupabaseDemoMode } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { withPrismaTransaction } from "@/lib/prisma";
 import { AuthenticationService } from "@/features/authentication/services/auth.service";
 import type { RequestContext } from "@/lib/http/request-context";
 import type { SessionContext } from "@/types/auth";
+
+jest.mock("@/lib/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+  },
+  isDevelopmentSupabaseDemoMode: jest.fn(),
+}));
 
 jest.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: jest.fn(),
@@ -109,6 +122,9 @@ function createUserRecord(overrides: Record<string, unknown> = {}) {
 describe("AuthenticationService", () => {
   const mockCreateSupabaseServerClient = jest.mocked(createSupabaseServerClient);
   const mockWithPrismaTransaction = jest.mocked(withPrismaTransaction);
+  const mockIsDevelopmentSupabaseDemoMode = jest.mocked(
+    isDevelopmentSupabaseDemoMode,
+  );
 
   const sessionService = {
     resolveSession: jest.fn(),
@@ -123,6 +139,7 @@ describe("AuthenticationService", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsDevelopmentSupabaseDemoMode.mockReturnValue(false);
     mockWithPrismaTransaction.mockImplementation(async (callback) => callback({} as never));
   });
 
@@ -165,6 +182,24 @@ describe("AuthenticationService", () => {
     );
     expect(auditService.record).toHaveBeenCalled();
     expect(result.user?.lastLoginAt).toBe("2024-02-01T00:00:00.000Z");
+  });
+
+  it("blocks sign-in in development demo mode without creating a Supabase client", async () => {
+    mockIsDevelopmentSupabaseDemoMode.mockReturnValue(true);
+
+    const service = new AuthenticationService(
+      sessionService as never,
+      userRepository as never,
+      auditService as never,
+    );
+
+    await expect(
+      service.signIn(
+        { email: "artist@example.com", password: "StrongPass123!" },
+        createRequestContext({ requestId: "request-demo" }),
+      ),
+    ).rejects.toBeInstanceOf(ServiceUnavailableError);
+    expect(mockCreateSupabaseServerClient).not.toHaveBeenCalled();
   });
 
   it("rejects sign-in when the session has no active application user", async () => {

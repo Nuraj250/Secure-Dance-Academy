@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const sessionService = new SessionService();
 
 type ProtectedPageProps = {
-  params?: Promise<{ slug?: string[] }>;
+  params: Promise<{ slug: string[] }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
@@ -24,14 +24,14 @@ export default async function ProtectedPage({
     redirect("/login");
   }
 
-  const routeParams = params ? await params : { slug: [] };
+  const routeParams = await params;
   const routeSearchParams = searchParams ? await searchParams : {};
 
   return (
     <ProtectedScreen
       searchParams={routeSearchParams}
       session={session}
-      slug={routeParams.slug ?? []}
+      slug={routeParams.slug}
     />
   );
 }

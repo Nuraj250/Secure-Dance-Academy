@@ -3,6 +3,7 @@ describe("security headers", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
     const originalSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const originalSupabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const mutableEnv = process.env as {
       -readonly [K in keyof NodeJS.ProcessEnv]: NodeJS.ProcessEnv[K];
     };
@@ -11,6 +12,7 @@ describe("security headers", () => {
       mutableEnv.NODE_ENV = "production";
       mutableEnv.NEXT_PUBLIC_APP_URL = "https://academy.example.com";
       mutableEnv.NEXT_PUBLIC_SUPABASE_URL = "https://secure-dance.supabase.co";
+      mutableEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
       jest.resetModules();
       const { responseSecurityHeaders } = await import("@/config/security");
@@ -28,6 +30,7 @@ describe("security headers", () => {
       mutableEnv.NODE_ENV = originalNodeEnv;
       mutableEnv.NEXT_PUBLIC_APP_URL = originalAppUrl;
       mutableEnv.NEXT_PUBLIC_SUPABASE_URL = originalSupabaseUrl;
+      mutableEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY = originalSupabaseAnonKey;
       jest.resetModules();
     }
   });

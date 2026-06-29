@@ -1,5 +1,6 @@
 import { withPrismaTransaction } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isDevelopmentSupabaseDemoMode } from "@/lib/env";
 import { sanitizeEmail } from "@/lib/security/sanitize";
 import { createAuditEvent } from "@/lib/security/audit";
 import { createRateLimitKey, enforceRateLimit } from "@/lib/security/rate-limit";
@@ -22,6 +23,9 @@ import { SessionService } from "@/features/authentication/services/session.servi
 import { AuditService } from "@/features/audit/services/audit.service";
 import { UserRepository } from "@/features/users/repositories/user.repository";
 
+const localDemoAuthUnavailableMessage =
+  "Local demo mode is running without Supabase authentication. Add valid Supabase values to .env.local to sign in.";
+
 export class AuthenticationService {
   constructor(
     private readonly sessionService = new SessionService(),
@@ -34,6 +38,10 @@ export class AuthenticationService {
     requestContext: RequestContext,
   ) {
     const parsedInput = signInSchema.parse(input);
+    if (isDevelopmentSupabaseDemoMode()) {
+      throw new ServiceUnavailableError(localDemoAuthUnavailableMessage);
+    }
+
     enforceRateLimit(
       createRateLimitKey("auth", "login", parsedInput.email),
       {
@@ -161,6 +169,10 @@ export class AuthenticationService {
   }
 
   async signOut(requestContext: RequestContext) {
+    if (isDevelopmentSupabaseDemoMode()) {
+      return this.sessionService.resolveSession(requestContext);
+    }
+
     const supabase = await createSupabaseServerClient();
     const session = await this.sessionService.resolveSession(requestContext);
 
@@ -204,6 +216,10 @@ export class AuthenticationService {
     requestContext: RequestContext,
   ) {
     const parsedInput = passwordRecoverySchema.parse(input);
+    if (isDevelopmentSupabaseDemoMode()) {
+      throw new ServiceUnavailableError(localDemoAuthUnavailableMessage);
+    }
+
     const email = sanitizeEmail(parsedInput.email);
     enforceRateLimit(
       createRateLimitKey("auth", "forgot-password", email),
@@ -262,6 +278,10 @@ export class AuthenticationService {
     requestContext: RequestContext,
   ) {
     const parsedInput = passwordResetSchema.parse(input);
+    if (isDevelopmentSupabaseDemoMode()) {
+      throw new ServiceUnavailableError(localDemoAuthUnavailableMessage);
+    }
+
     const supabase = await createSupabaseServerClient();
     const session = await this.sessionService.resolveSession(requestContext);
 

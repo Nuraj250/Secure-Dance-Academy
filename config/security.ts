@@ -1,8 +1,6 @@
-import { env } from "../lib/env";
+import { env, getSupabaseConnectOrigin } from "../lib/env";
 
-const supabaseConnectSrc = env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(env.NEXT_PUBLIC_SUPABASE_URL).origin
-  : null;
+const supabaseConnectSrc = getSupabaseConnectOrigin();
 
 const connectSrc = ["'self'", supabaseConnectSrc, "https://*.supabase.co"]
   .filter((value): value is string => Boolean(value))

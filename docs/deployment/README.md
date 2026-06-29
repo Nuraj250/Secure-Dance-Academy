@@ -13,7 +13,8 @@ Audience: developers, assessors, system administrators, and deployment owners.
 - PostgreSQL 16 or a Supabase PostgreSQL project.
 - Supabase project with Authentication enabled.
 - Git checkout of this repository.
-- Environment variables from `.env.example`.
+- Environment variables from `.env.example` copied into `.env.local` for local
+  development.
 
 ## Environment Variables
 
@@ -22,12 +23,16 @@ Audience: developers, assessors, system administrators, and deployment owners.
 | `NODE_ENV` | Yes | Runtime mode: `development`, `test`, or `production`. |
 | `NEXT_PUBLIC_APP_URL` | Yes | Canonical application URL used for redirects and CSRF checks. |
 | `DATABASE_URL` | Yes for database-backed runs | Prisma connection string for PostgreSQL. |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes for Supabase auth | Public Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for browser auth | Public anonymous Supabase key. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes for Supabase auth | Public Supabase project URL. Must not be the example placeholder. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes for browser auth | Public anonymous Supabase key. Must not be an example placeholder. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Optional, sensitive | Reserved for privileged server operations. Never expose it to the browser. |
 
-Never commit `.env` or production secrets. Use Vercel environment settings,
-Docker secrets, or the target platform's secret manager for production values.
+For local coursework review, missing or placeholder Supabase URL/anon-key values
+activate a safe unauthenticated demo mode only when `NODE_ENV=development`.
+Production must use real Supabase values and fails securely when auth
+configuration is missing or invalid. Never commit `.env.local`, `.env`, or
+production secrets. Use Vercel environment settings, Docker secrets, or the
+target platform's secret manager for production values.
 
 ## Local Installation
 
@@ -40,28 +45,37 @@ Docker secrets, or the target platform's secret manager for production values.
 2. Create a local environment file.
 
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
    ```
 
-3. Generate Prisma Client.
+3. Fill `.env.local` with real values when authentication, password recovery,
+   or database-backed workflows are part of the local run. The required
+   Supabase values are:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<project-anon-key>
+   ```
+
+4. Generate Prisma Client.
 
    ```bash
    npm run prisma:generate
    ```
 
-4. Apply database migrations when migration files are present.
+5. Apply database migrations when migration files are present.
 
    ```bash
    npm run prisma:migrate
    ```
 
-5. Seed baseline data when needed.
+6. Seed baseline data when needed.
 
    ```bash
    npm run db:seed
    ```
 
-6. Start the app.
+7. Start the app.
 
    ```bash
    npm run dev

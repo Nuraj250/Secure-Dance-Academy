@@ -69,16 +69,21 @@ See `docs/index.md` for the authoritative documentation map.
 2. Create local environment variables:
 
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
    ```
 
-3. Generate Prisma Client:
+3. Replace the placeholder Supabase values in `.env.local` when you need real
+   authentication. If they are missing or still use the example placeholders,
+   `npm run dev` starts in a safe unauthenticated local demo mode so coursework
+   reviewers can load the UI without secrets.
+
+4. Generate Prisma Client:
 
    ```bash
    npm run prisma:generate
    ```
 
-4. Start the development server:
+5. Start the development server:
 
    ```bash
    npm run dev
@@ -93,11 +98,15 @@ The application reads these environment variables:
 | `NODE_ENV` | Runtime mode. |
 | `NEXT_PUBLIC_APP_URL` | Canonical app URL for redirects and CSRF checks. |
 | `DATABASE_URL` | PostgreSQL connection string. |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous browser key. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Sensitive server-side key reserved for privileged operations. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Required for Supabase-backed authentication. Use the project URL from Supabase, not `https://example.supabase.co`. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Required for Supabase-backed authentication. Use the public anon key from Supabase, not an example value. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional sensitive server-side key reserved for privileged operations. Leave unset unless a server-only feature requires it. |
 
-Do not commit `.env` files or production secrets.
+For local development, put real values in `.env.local`. Missing or placeholder
+Supabase URL/anon-key values activate local demo mode only when
+`NODE_ENV=development`; production still fails securely instead of bypassing
+authentication or RBAC. Do not commit `.env.local`, `.env` files, or production
+secrets.
 
 ## Verification
 

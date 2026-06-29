@@ -6,6 +6,7 @@ import {
   isRoleCode,
   pickPrimaryRole,
 } from "@/lib/auth/rbac";
+import { isDevelopmentSupabaseDemoMode } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { SessionContext, SessionUser } from "@/types/auth";
 import type { AppRoleCode } from "@/types/rbac";
@@ -71,6 +72,15 @@ export class SessionService {
   async resolveSession(
     requestContext: RequestContext = createRequestContext(),
   ): Promise<SessionContext> {
+    if (isDevelopmentSupabaseDemoMode()) {
+      return {
+        ...requestContext,
+        supabaseIdentity: null,
+        user: null,
+        isAuthenticated: false,
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.auth.getUser();
 

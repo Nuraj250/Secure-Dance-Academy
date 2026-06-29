@@ -1,7 +1,16 @@
 import { AuthenticationError } from "@/lib/http/errors";
+import { isDevelopmentSupabaseDemoMode } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SessionService } from "@/features/authentication/services/session.service";
 import type { SessionContext } from "@/types/auth";
+
+jest.mock("@/lib/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+  },
+  isDevelopmentSupabaseDemoMode: jest.fn(),
+}));
 
 jest.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: jest.fn(),
@@ -56,9 +65,40 @@ function createUserRecord(overrides: Partial<Record<string, unknown>> = {}) {
 
 describe("SessionService", () => {
   const mockCreateSupabaseServerClient = jest.mocked(createSupabaseServerClient);
+  const mockIsDevelopmentSupabaseDemoMode = jest.mocked(
+    isDevelopmentSupabaseDemoMode,
+  );
 
   beforeEach(() => {
     jest.resetAllMocks();
+    mockIsDevelopmentSupabaseDemoMode.mockReturnValue(false);
+  });
+
+  it("returns an unauthenticated session in development demo mode", async () => {
+    mockIsDevelopmentSupabaseDemoMode.mockReturnValue(true);
+
+    const userRepository = {
+      findBySupabaseUserId: jest.fn(),
+    } as unknown as UserRepositoryMock;
+
+    const service = new SessionService(userRepository as never);
+    const session = await service.resolveSession({
+      requestId: "request-demo",
+      ipAddress: "127.0.0.1",
+      userAgent: "jest",
+      origin: "http://localhost:3000",
+      supabaseIdentity: null,
+      user: null,
+      isAuthenticated: false,
+    });
+
+    expect(session).toMatchObject({
+      supabaseIdentity: null,
+      user: null,
+      isAuthenticated: false,
+    });
+    expect(mockCreateSupabaseServerClient).not.toHaveBeenCalled();
+    expect(userRepository.findBySupabaseUserId).not.toHaveBeenCalled();
   });
 
   it("returns an unauthenticated session when Supabase rejects the request", async () => {
